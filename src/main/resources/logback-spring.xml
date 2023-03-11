@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+<configuration>
+    <!--引用默认日志配置-->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <!--使用默认的控制台日志输出实现-->
+    <!--    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>-->
+    <!--应用名称-->
+    <!--    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="springBoot"/>-->
+    <!--    &lt;!&ndash;日志文件保存路径&ndash;&gt;-->
+    <!--    <property name="LOG_FILE_PATH" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/logs}"/>-->
+    <!--    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />-->
+    <!--    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />-->
+    <!--    <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />-->
+    <property name="LOG_FILE_MAX_SIZE" value="50MB"/>
+    <!--    <Property name="LOG_EXCEPTION_CONVERSION_WORD" value="-%wEx" />-->
+    <!--    <property name="LOG_DATEFORMAT_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}"/>-->
+    <!--    <property name="LOG_LEVEL_PATTERN" value="%-5level"/>-->
+    <!--    <property name="CONSOLE_LOG_PATTERN" value="%clr(${LOG_DATEFORMAT_PATTERN}){faint} %clr(${LOG_LEVEL_PATTERN}) %clr(${PID}){magenta} %clr(-){faint} %clr([%5.20t]){faint} %clr(%-20.40logger{5}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD}"/>-->
+    <!--    <property name="CONSOLE_LOG_CHARSET" value="${CONSOLE_LOG_CHARSET:-${file.encoding:-UTF-8}}"/>-->
+    <!--    <property name="FILE_LOG_PATTERN" value="${LOG_DATEFORMAT_PATTERN} ${LOG_LEVEL_PATTERN} ${PID} -[%t] %-20.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD}"/>-->
+    <!--    <property name="FILE_LOG_CHARSET" value="${FILE_LOG_CHARSET:-${file.encoding:-UTF-8}}"/>-->
+    <!--    &lt;!&ndash; 不带彩色的日志在控制台输出时候的设置 &ndash;&gt;-->
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+    <!--    &lt;!&ndash;Info日志输出到文件&ndash;&gt;-->
+    <!--    <appender name="FILE_DEBUG"-->
+    <!--              class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+    <!--        &lt;!&ndash;输出DEBUG以上级别日志&ndash;&gt;-->
+    <!--        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
+    <!--            <level>INFO</level>-->
+    <!--        </filter>-->
+    <!--        <encoder>-->
+    <!--            &lt;!&ndash;设置为默认的文件日志格式&ndash;&gt;-->
+    <!--            <pattern>${FILE_LOG_PATTERN}</pattern>-->
+    <!--            <charset>UTF-8</charset>-->
+    <!--        </encoder>-->
+    <!--        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">-->
+    <!--            &lt;!&ndash;设置文件命名格式&ndash;&gt;-->
+    <!--            <fileNamePattern>${LOG_FILE_PATH}/info/${APP_NAME}-%d{yyyy-MM-dd}-%i.log</fileNamePattern>-->
+    <!--            &lt;!&ndash;设置日志文件大小，超过就重新生成文件，默认10M&ndash;&gt;-->
+    <!--            <maxFileSize>${LOG_FILE_MAX_SIZE:-10MB}</maxFileSize>-->
+    <!--            &lt;!&ndash;日志文件保留天数，默认30天&ndash;&gt;-->
+    <!--            <maxHistory>${LOG_FILE_MAX_HISTORY:-30}</maxHistory>-->
+    <!--        </rollingPolicy>-->
+    <!--    </appender>-->
+    <!--    &lt;!&ndash;DEBUG日志输出到文件&ndash;&gt;-->
+    <!--    <appender name="FILE_DEBUG"-->
+    <!--              class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+    <!--        &lt;!&ndash;输出DEBUG以上级别日志&ndash;&gt;-->
+    <!--        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
+    <!--            <level>DEBUG</level>-->
+    <!--        </filter>-->
+    <!--        <encoder>-->
+    <!--            &lt;!&ndash;设置为默认的文件日志格式&ndash;&gt;-->
+    <!--            <pattern>${FILE_LOG_PATTERN}</pattern>-->
+    <!--            <charset>UTF-8</charset>-->
+    <!--        </encoder>-->
+    <!--        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">-->
+    <!--            &lt;!&ndash;设置文件命名格式&ndash;&gt;-->
+    <!--            <fileNamePattern>${LOG_FILE_PATH}/debug/${APP_NAME}-%d{yyyy-MM-dd}-%i.log</fileNamePattern>-->
+    <!--            &lt;!&ndash;设置日志文件大小，超过就重新生成文件，默认10M&ndash;&gt;-->
+    <!--            <maxFileSize>${LOG_FILE_MAX_SIZE:-10MB}</maxFileSize>-->
+    <!--            &lt;!&ndash;日志文件保留天数，默认30天&ndash;&gt;-->
+    <!--            <maxHistory>${LOG_FILE_MAX_HISTORY:-30}</maxHistory>-->
+    <!--        </rollingPolicy>-->
+    <!--    </appender>-->
+
+    <!--    &lt;!&ndash;ERROR日志输出到文件&ndash;&gt;-->
+    <!--    <appender name="FILE_ERROR"-->
+    <!--              class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+    <!--        &lt;!&ndash;只输出ERROR级别的日志&ndash;&gt;-->
+    <!--        <filter class="ch.qos.logback.classic.filter.LevelFilter">-->
+    <!--            <level>ERROR</level>-->
+    <!--            <onMatch>ACCEPT</onMatch>-->
+    <!--            <onMismatch>DENY</onMismatch>-->
+    <!--        </filter>-->
+    <!--        <encoder>-->
+    <!--            &lt;!&ndash;设置为默认的文件日志格式&ndash;&gt;-->
+    <!--            <pattern>${FILE_LOG_PATTERN}</pattern>-->
+    <!--            <charset>UTF-8</charset>-->
+    <!--        </encoder>-->
+    <!--        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">-->
+    <!--            &lt;!&ndash;设置文件命名格式&ndash;&gt;-->
+    <!--            <fileNamePattern>${LOG_FILE_PATH}/error/${APP_NAME}-%d{yyyy-MM-dd}-%i.log</fileNamePattern>-->
+    <!--            &lt;!&ndash;设置日志文件大小，超过就重新生成文件，默认10M&ndash;&gt;-->
+    <!--            <maxFileSize>${LOG_FILE_MAX_SIZE:-10MB}</maxFileSize>-->
+    <!--            &lt;!&ndash;日志文件保留天数，默认30天&ndash;&gt;-->
+    <!--            <maxHistory>${LOG_FILE_MAX_HISTORY:-30}</maxHistory>-->
+    <!--        </rollingPolicy>-->
+    <!--    </appender>-->
+    <appender name="dailyRollingFileAppender"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <prudent>true</prudent>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+            <fileNamePattern>/var/log/changliulab/lab-standalone.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+
+        <encoder>
+            <pattern>%d{yyyy:MM:dd HH:mm:ss.SSS} %-5level --- [%thread] %logger{35} : %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <!--控制框架输出日志-->
+    <logger name="org.slf4j" level="INFO"/>
+    <logger name="springfox" level="INFO"/>
+    <logger name="io.swagger" level="INFO"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.hibernate.validator" level="INFO"/>
+    <logger name="com.baomidou" level="INFO"/>
+    <logger name="com.alibaba.nacos.client.naming" level="INFO"/>
+    <logger name="org.apache.catalina.startup.DigesterFactory" level="ERROR"/>
+    <logger name="org.apache.catalina.util.LifecycleBase" level="ERROR"/>
+    <logger name="org.apache.coyote.http11.Http11NioProtocol" level="WARN"/>
+    <logger name="org.apache.sshd.common.util.SecurityUtils" level="WARN"/>
+    <logger name="org.apache.tomcat.util.net.NioSelectorPool" level="WARN"/>
+    <logger name="org.eclipse.jetty.util.component.AbstractLifeCycle" level="ERROR"/>
+    <logger name="org.hibernate.validator.internal.util.Version" level="WARN"/>
+    <logger name="org.springframework.boot.actuate.endpoint.jmx" level="WARN"/>
+    <logger name="org.thymeleaf" level="INFO"/>
+    <root>
+<!--        <appender-ref ref="dailyRollingFileAppender"/>-->
+        <appender-ref ref="CONSOLE"/>
+        <!--        <appender-ref ref="FILE_DEBUG"/>-->
+        <!--        <appender-ref ref="FILE_ERROR"/>-->
+    </root>
+
+</configuration>

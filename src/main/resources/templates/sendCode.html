@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Changliu Lab [[${mailPurpose}]]</title>
+    <style>
+        .p0{
+            padding: 0;
+        }
+        .pt25{
+            padding-top: 25px;
+        }
+        .f17{
+            font-size: 17px;
+        }
+        .f41{
+            font-size: 41px;
+        }
+        .f14{
+            font-size: 14px;
+        }
+        .fb20{
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .fontSB{
+            font-family: 'Segoe UI Semibold', 'Segoe UI Bold', 'Segoe UI', 'Helvetica Neue Medium', Arial, sans-serif ;
+        }
+        .fontSL{
+            font-family: 'Segoe UI Light', 'Segoe UI', 'Helvetica Neue Medium', Arial, sans-serif;
+        }
+        .fontS{
+            font-family: 'Segoe UI', Tahoma, Verdana, Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+<table >
+    <tr>
+        <td class="p0 fontSB f17"
+            style="color:#707070;">
+            Changliu Lab account
+        </td>
+    </tr>
+    <tr>
+        <td class="p0 fontSL f41"
+            style="color:#7cfc00;">
+            Security code
+    </tr>
+    <tr>
+        <td class="p0 pt25 fontS f14"
+            style="color:#2a2a2a;">
+            Please use the following [[${codeName}]] for the Changliu Lab account <span class="fontSB fb20" th:if="${expire>0}" > within 20 Minutes</span>.
+        </td>
+    </tr>
+    <tr>
+        <td class="p0 pt25 fontS f14"
+            style="color:#2a2a2a;">
+            [[${codeName}]]:
+            <span class="fontS fb20" style="color:#2a2a2a;">[[${code}]]</span>
+        </td>
+    </tr>
+    <tr>
+        <td class="p0 pt25 fontS f14"
+            style="color:#2a2a2a;">
+            If you didn't request this code, you can safely ignore this email. Someone else might have typed your email
+            address by mistake.
+        </td>
+    </tr>
+    <tr>
+        <td class="p0 pt25 fontS f14"
+            style="color:#2a2a2a;">
+            Thanks,
+        </td>
+    </tr>
+    <tr>
+        <td class="p0 fontS f14"
+            style="color:#2a2a2a;">
+            The Changliu Lab account team.
+        </td>
+    </tr>
+    <tr>
+        <td class="p0 fontS f14"
+            style="color:#2a2a2a;">
+            Do not reply to this email address.
+        </td>
+    </tr>
+</table>
+</body>
+
+</html>

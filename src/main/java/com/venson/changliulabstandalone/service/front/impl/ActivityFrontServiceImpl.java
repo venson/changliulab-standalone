@@ -28,6 +28,7 @@ public class ActivityFrontServiceImpl implements ActivityFrontService {
     @Cacheable(value = FrontCacheConst.ACTIVITY_PAGE_NAME,key = "#page")
     public PageResponse<EduActivityPublished> getPageActivity(Integer page, Integer limit) {
         LambdaQueryWrapper<EduActivityPublished> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(EduActivityPublished::getEnable, true);
         wrapper.select(EduActivityPublished::getId,EduActivityPublished::getTitle,
                 EduActivityPublished::getAuthorMemberName,EduActivityPublished::getActivityDate);
         Page<EduActivityPublished> pageActivity = new Page<>(page, limit);
@@ -45,7 +46,7 @@ public class ActivityFrontServiceImpl implements ActivityFrontService {
         activity.setId(id);
         activity.setTitle(eduActivity.getTitle());
         activity.setAuthorMemberName(activity.getAuthorMemberName());
-        activity.setMarkdown(eduActivityMd.getMarkdown());
+        activity.setHtmlBrBase64(eduActivityMd.getHtmlBrBase64());
         return activity;
     }
 

@@ -55,18 +55,16 @@ public class AuthTokenFilter extends OncePerRequestFilter implements Ordered {
         String token = getBearerToken(req);
         List<String> pathWhiteList = pathAdapter.pathWhiteList();
         List<PathPattern> patternWhiteList = pathAdapter.patternWhiteList();
-        List<PathPattern> patternDocList = pathAdapter.patternDocList();
+//        List<PathPattern> patternDocList = pathAdapter.patternDocList();
         UsernamePasswordAuthenticationToken authentication;
 
         //1.request math white list
+        // login url
         if (checkPathWhiteList(requestURI, pathWhiteList)) {
             chain.doFilter(req, res);
             return;
         }
-        if (checkPathPatternWhiteList(requestURI, patternDocList)) {
-            chain.doFilter(req, res);
-            return;
-        }
+        //        /*/front/**
         // 2. request match pattern
         if (checkPathPatternWhiteList(requestURI, patternWhiteList)) {
             if (token != null && !"undefined".equals(token)) {
@@ -97,6 +95,9 @@ public class AuthTokenFilter extends OncePerRequestFilter implements Ordered {
             log.info(req.getRemoteAddr());
             log.info(req.getRequestURI());
             ResponseUtil.out(res, Result.tokenExpire());
+        }finally {
+            SecurityContextHolder.clearContext();
+
         }
 
     }

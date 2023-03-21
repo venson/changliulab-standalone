@@ -52,7 +52,7 @@ public class EduResearchServiceImp extends ServiceImpl<EduResearchMapper, EduRes
     public PageResponse<EduResearch> getResearchPage(Integer page, Integer limit) {
         Page<EduResearch> researchPage = new Page<>(page, limit);
         LambdaQueryWrapper<EduResearch> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(EduResearch::getId, EduResearch::getTitle, EduResearch::getReview, EduResearch::getIsModified
+        wrapper.select(EduResearch::getId, EduResearch::getTitle, EduResearch::getReview, EduResearch::getIsModified,EduResearch::getIsPublished
                 , EduResearch::getLanguage, EduResearch::getEnable);
         baseMapper.selectPage(researchPage, wrapper);
         return PageUtil.toBean(researchPage);
@@ -158,7 +158,7 @@ public class EduResearchServiceImp extends ServiceImpl<EduResearchMapper, EduRes
     public AdminResearchDTO getResearchById(Long id) {
         EduResearch research = baseMapper.selectById(id);
         Assert.notNull(research,"Invalid research");
-        Assert.isTrue(research.getReview() != ReviewStatus.APPLIED, "Research is under review");
+//        Assert.isTrue(research.getReview() != ReviewStatus.APPLIED, "Research is under review");
         List<BasicMemberVo> members = researchMemberService.getMembersByResearchId(id);
         AdminResearchDTO dto = new AdminResearchDTO();
         BeanUtils.copyProperties(research,dto, "htmlBrBase64");

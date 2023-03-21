@@ -26,7 +26,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -176,15 +175,7 @@ public class ActivityStateMachineConfig {
 
                         }
                         CacheUtils.evict(cacheManager,FrontCacheConst.ACTIVITY_NAME,activityId.toString());
-//                        Cache activityCache = cacheManager.getCache(FrontCacheConst.ACTIVITY_NAME);
-//                        if(activityCache!=null){
-//                            activityCache.evict(activityId);
-//                        }
                         CacheUtils.evict(cacheManager,FrontCacheConst.ACTIVITY_PAGE_NAME);
-//                        Cache activityPage = cacheManager.getCache(FrontCacheConst.ACTIVITY_PAGE_NAME);
-//                        if(activityCache!=null){
-//                            activityCache.clear();
-//                        }
 
                     }
                 }

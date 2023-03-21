@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 public final class FrontCacheConst {
     private FrontCacheConst(){}
     public static final String HOME_NAME="home";
+    public static final String HOME_HOME_KEY="'home'";
     public static final String HOME_ACTIVITY_KEY="'activity'";
     public static final String HOME_MEMBER_KEY="'member'";
     public static final String HOME_COURSE_KEY="'course'";

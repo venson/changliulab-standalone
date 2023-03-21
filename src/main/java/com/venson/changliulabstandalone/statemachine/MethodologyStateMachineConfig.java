@@ -145,6 +145,7 @@ public class MethodologyStateMachineConfig {
                         methodology.setPublishedHtmlBrBase64(methodology.getHtmlBrBase64());
                         methodology.setReview(ReviewStatus.FINISHED);
                         methodology.setIsPublic(true);
+                        methodology.setIsPublished(true);
                         methodologyMapper.updateById(methodology);
                         CacheUtils.evict(cacheManager, FrontCacheConst.METHODOLOGY_NAME, methodologyId.toString());
                         CacheUtils.evict(cacheManager, FrontCacheConst.METHODOLOGY_PAGE_NAME);

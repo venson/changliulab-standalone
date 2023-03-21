@@ -27,6 +27,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -422,10 +423,16 @@ public class AdminPermissionServiceImpl extends ServiceImpl<AdminPermissionMappe
             LambdaQueryWrapper<AdminPermission> wrapper = new LambdaQueryWrapper<>();
             wrapper.orderByDesc(AdminPermission::getId)
                     .ne(AdminPermission::getType, 0)
-                    .ne(!allPermission, AdminPermission::getType, 2)
                     .select(AdminPermission::getId, AdminPermission::getName, AdminPermission::getPath,
                             AdminPermission::getPid, AdminPermission::getComponent, AdminPermission::getPermissionValue,
                             AdminPermission::getType, AdminPermission::getIcon);
-        return baseMapper.selectList(wrapper);
+        List<AdminPermission> permissions= baseMapper.selectList(wrapper);
+        if(allPermission){
+            return permissions;
+        }else{
+            return permissions.stream().filter(permission -> StringUtils.hasText(permission.getPath())).collect(Collectors.toList());
+//            return permissions.stream().filter(StringUtils.hasText(AdminPermission::getPath)).collect(Collectors.toList());
+
+        }
     }
 }

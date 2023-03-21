@@ -45,7 +45,7 @@ public class MemberFrontServiceImpl implements MemberFrontService {
 //    }
 
     @Override
-    @Cacheable(value = FrontCacheConst.MEMBER_PAGE_NAME, key = "#level+':'+#page+'")
+    @Cacheable(value = FrontCacheConst.MEMBER_PAGE_NAME, key = "#level+':'+#page")
     public PageResponse<EduMember> getPageFrontMemberListByLevel(Integer page, Integer limit, MemberLevel level) {
         LambdaQueryWrapper<EduMember> wrapper = new LambdaQueryWrapper<>();
 //        switch (level) {

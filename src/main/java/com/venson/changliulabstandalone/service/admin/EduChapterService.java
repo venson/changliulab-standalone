@@ -1,12 +1,15 @@
 package com.venson.changliulabstandalone.service.admin;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
 import com.venson.changliulabstandalone.entity.pojo.EduChapter;
 import com.venson.changliulabstandalone.entity.dto.ChapterContentDTO;
 import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
+import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.entity.vo.CourseTreeNodeVo;
 import com.venson.changliulabstandalone.entity.front.dto.ChapterFrontDTO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -36,4 +39,6 @@ public interface EduChapterService extends IService<EduChapter> {
 
 
     Map<Long, ReviewStatus> getChapterReviewStatusMap(boolean review);
+
+//    Collection<? extends ReviewBasicDTO> getInfoByReviews(List<EduReview> values);
 }

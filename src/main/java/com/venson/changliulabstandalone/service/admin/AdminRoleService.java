@@ -2,7 +2,9 @@ package com.venson.changliulabstandalone.service.admin;
 
 import com.venson.changliulabstandalone.entity.pojo.AdminRole;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.venson.changliulabstandalone.entity.dto.AdminRolePermissionDTO;
+import com.venson.changliulabstandalone.entity.dto.AdminRoleDTO;
+import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
+import com.venson.changliulabstandalone.utils.PageResponse;
 
 import java.util.List;
 //import java.util.Map;
@@ -25,9 +27,13 @@ public interface AdminRoleService extends IService<AdminRole> {
 
     List<AdminRole> selectRoleByUserId(Long id);
 
-    void addRoleWithPermissions(AdminRolePermissionDTO rolePermissionDTO);
+    Long addRoleWithPermissions(AdminRoleDTO rolePermissionDTO);
 
-    void updateRoleWithPermissions(AdminRolePermissionDTO rolePermissionDTO);
+    void updateRoleWithPermissions(AdminRoleDTO rolePermissionDTO);
 
     void removeRoleById(Long id);
+
+    PageResponse<AdminRole> getPage(PageQueryVo vo);
+
+    AdminRoleDTO getRoleById(Long id);
 }

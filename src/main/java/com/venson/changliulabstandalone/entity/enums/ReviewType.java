@@ -8,7 +8,8 @@ public enum ReviewType implements IEnum<Integer> {
     SECTION(3),
     ACTIVITY(4),
     RESEARCH(5),
-    METHODOLOGY(6),;
+    METHODOLOGY(6),
+    REPORT(7),;
 //    COURSE_INFO(7,"course"),
 //    CHAPTER_INFO(8,"course"),
 

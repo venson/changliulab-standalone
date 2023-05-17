@@ -11,13 +11,13 @@ import com.venson.changliulabstandalone.entity.pojo.CrmBanner;
 import com.venson.changliulabstandalone.entity.dto.BannerDTO;
 import com.venson.changliulabstandalone.mapper.CrmBannerMapper;
 import com.venson.changliulabstandalone.service.admin.CrmBannerService;
+import com.venson.changliulabstandalone.utils.Assert;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.utils.PageUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import java.util.List;
 
@@ -62,7 +62,7 @@ public class CrmBannerServiceImp extends ServiceImpl<CrmBannerMapper, CrmBanner>
 
     @Override
     public Long addBanner(BannerDTO banner) {
-        Assert.isTrue(isUsableTitle(null, banner.getTitle()), "Duplicated Title" );
+        checkTitleUsable(null, banner.getTitle());
         CrmBanner crmBanner = new CrmBanner();
         BeanUtils.copyProperties(banner,crmBanner);
         baseMapper.insert(crmBanner);
@@ -82,16 +82,9 @@ public class CrmBannerServiceImp extends ServiceImpl<CrmBannerMapper, CrmBanner>
         baseMapper.update(null,wrapper);
     }
 
-    private boolean isUsableTitle(Long id, String title){
-        LambdaQueryWrapper<CrmBanner> wrapper = Wrappers.lambdaQuery(CrmBanner.class).eq(CrmBanner::getTitle, title);
-        if(id!=null){
-            wrapper.ne(CrmBanner::getId, id);
-        }
-        return baseMapper.selectOne(wrapper) == null;
-    }
     private void checkTitleUsable(Long id, String title){
         LambdaQueryWrapper<CrmBanner> wrapper = Wrappers.lambdaQuery(CrmBanner.class).eq(CrmBanner::getTitle, title);
             wrapper.ne(id!=null,CrmBanner::getId, id);
-        Assert.isNull(baseMapper.selectOne(wrapper) , "Duplicated Title");
+        Assert.isTrue(baseMapper.exists(wrapper) , "Duplicated Title");
     }
 }

@@ -1,10 +1,11 @@
 package com.venson.changliulabstandalone.entity.dto;
 
 import com.venson.changliulabstandalone.entity.enums.MemberLevel;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
-@Data
+@Getter
+@NoArgsConstructor
+@Setter
 @ToString
 public class MemberQuery {
 

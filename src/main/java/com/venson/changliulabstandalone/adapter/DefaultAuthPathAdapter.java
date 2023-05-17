@@ -2,6 +2,7 @@ package com.venson.changliulabstandalone.adapter;
 
 import com.venson.changliulabstandalone.constant.AuthConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
@@ -38,6 +39,28 @@ public class DefaultAuthPathAdapter implements AuthPathAdapter{
     @Override
     public List<PathPattern> patternDocList() {
         return patternDocList;
+    }
+
+    @Override
+    public boolean checkWhiteList(String url) {
+        if(pathWhiteList.size() ==0){
+            throw new RuntimeException("pathWhite list is empty");
+        }
+        for (String path : pathWhiteList) {
+            if( path.equals(url)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean checkPatternList(String url) {
+        if(patternWhiteList.size() ==0 )
+            throw new RuntimeException("Path pattern white list is empty");
+        PathContainer path = PathContainer.parsePath(url);
+        for (PathPattern pathPattern : patternWhiteList) {
+            if(pathPattern.matches(path)) return true;
+        }
+        return false;
     }
 
 }

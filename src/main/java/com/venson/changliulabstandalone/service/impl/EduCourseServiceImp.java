@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.venson.changliulabstandalone.entity.pojo.EduCourse;
-import com.venson.changliulabstandalone.entity.pojo.EduCourseDescription;
-import com.venson.changliulabstandalone.entity.pojo.EduMember;
-import com.venson.changliulabstandalone.entity.pojo.EduSubject;
+import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
+import com.venson.changliulabstandalone.entity.enums.ReviewType;
+import com.venson.changliulabstandalone.entity.pojo.*;
+import com.venson.changliulabstandalone.entity.vo.admin.ListQueryParams;
 import com.venson.changliulabstandalone.exception.CustomizedException;
 import com.venson.changliulabstandalone.service.admin.*;
 import com.venson.changliulabstandalone.utils.PageResponse;
@@ -18,15 +18,16 @@ import com.venson.changliulabstandalone.entity.dto.CoursePreviewVo;
 import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
 import com.venson.changliulabstandalone.mapper.EduCourseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -39,21 +40,17 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class EduCourseServiceImp extends ServiceImpl<EduCourseMapper, EduCourse> implements EduCourseService {
 
     // base service
-    @Autowired
-    private EduChapterService chapterService;
-    @Autowired
-    private EduSectionService sectionService;
-    @Autowired
-    private EduCourseDescriptionService courseDescriptionService;
+    private final EduChapterService chapterService;
+    private final EduSectionService sectionService;
+    private final EduCourseDescriptionService courseDescriptionService;
 
-    @Autowired
-    private EduMemberService memberService;
+    private final EduMemberService memberService;
 
-    @Autowired
-    private EduSubjectService subjectService;
+    private final EduSubjectService subjectService;
 
 
 
@@ -234,6 +231,85 @@ public class EduCourseServiceImp extends ServiceImpl<EduCourseMapper, EduCourse>
             dtoRecords.add(temp);
         });
         return PageUtil.toBean(dtoPage);
+    }
+
+    @Override
+    public PageResponse<EduCourse> getPageCoursePublishVo(ListQueryParams params) {
+
+        Page<EduCourse> page = new Page<>(params.page(),params.perPage());
+        // 不能使用LambdaQueryWrapper
+        LambdaQueryWrapper<EduCourse> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(EduCourse::getId, EduCourse::getTitle, EduCourse::getReview,
+                EduCourse::getIsPublished, EduCourse::getIsModified, EduCourse::getIsRemoveAfterReview);
+        baseMapper.selectPage(page,wrapper);
+        return PageUtil.toBean(page);
+    }
+
+    @Override
+    public List<ReviewBasicDTO> getInfoByReviews(Map<ReviewType, List<EduReview>> courseRelates) {
+        if(courseRelates.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<Long> sectionIds = courseRelates.getOrDefault(ReviewType.SECTION, Collections.emptyList()).stream()
+                .map(EduReview::getRefId).collect(Collectors.toList());
+        List<Long> chapterIds = courseRelates.getOrDefault(ReviewType.CHAPTER, Collections.emptyList())
+                .stream()
+                .map(EduReview::getRefId)
+                .collect(Collectors.toList());
+        List<Long> courseIds = courseRelates.getOrDefault(ReviewType.COURSE, Collections.emptyList())
+                .stream()
+                .map(EduReview::getRefId)
+                .collect(Collectors.toList());
+        Map<Long, EduSection> sectionMap = new HashMap<>();
+        Map<Long, EduChapter> chapterMap = new HashMap<>();
+
+        if(!sectionIds.isEmpty()){
+            List<EduSection> eduSections = sectionService.listByIds(sectionIds);
+            sectionMap.putAll(eduSections.stream().collect(Collectors.toMap(EduSection::getId, Function.identity())));
+            chapterIds.addAll(eduSections.stream().map(EduSection::getChapterId).toList());
+        }
+
+        if(!chapterIds.isEmpty()){
+            List<EduChapter> chapterList = chapterService.listByIds(chapterIds);
+            courseIds.addAll(chapterList.stream().map(EduChapter::getCourseId).toList());
+            chapterMap.putAll(chapterList.stream().collect(Collectors.toMap(EduChapter::getId,Function.identity())));
+        }
+
+        List<EduCourse> courseList = baseMapper.selectBatchIds(courseIds);
+        Map<Long, EduCourse> courseMap = new HashMap<>(courseList.stream().collect(Collectors.toMap(EduCourse::getId, Function.identity())));
+        return  courseRelates.values().stream().flatMap(Collection::stream).map(review ->ReviewBasicDTO.builder()
+                        .id(review.getId())
+                        .review(review.getStatus())
+                        .type(review.getRefType())
+                        .id(review.getId())
+                        .refId(review.getRefId())
+                        .gmtCreate(review.getGmtCreate())
+                        .title(getTitleByIdType(review.getRefId(),review.getRefType(),sectionMap,chapterMap,courseMap))
+                        .subTitle(getSubTitleByIdType(review.getRefId(),review.getRefType(),sectionMap,chapterMap,courseMap))
+                .build())
+                .toList();
+    }
+
+    private String getTitleByIdType(Long refId, ReviewType refType, Map<Long, EduSection> sectionMap, Map<Long, EduChapter> chapterMap, Map<Long, EduCourse> courseMap) {
+        return switch (refType) {
+            case SECTION -> sectionMap.get(refId).getTitle();
+            case CHAPTER -> chapterMap.get(refId).getTitle();
+            case COURSE -> courseMap.get(refId).getTitle();
+            default -> null;
+        };
+    }
+    private String getSubTitleByIdType(Long refId, ReviewType refType, Map<Long, EduSection> sectionMap, Map<Long, EduChapter> chapterMap, Map<Long, EduCourse> courseMap) {
+        if(refType.equals(ReviewType.SECTION)){
+            Long courseId = sectionMap.get(refId).getCourseId();
+            Long chapterId= sectionMap.get(refId).getChapterId();
+
+            return courseMap.get(courseId).getTitle() + "-" + chapterMap.get(chapterId).getTitle();
+        }
+        if(refType.equals(ReviewType.CHAPTER)){
+            Long courseId = chapterMap.get(refId).getCourseId();
+            return courseMap.get(courseId).getTitle() ;
+        }
+        return null;
     }
 
 

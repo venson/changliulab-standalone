@@ -6,10 +6,12 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import com.venson.changliulabstandalone.exception.CustomizedException;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 public abstract class Assert {
 
@@ -128,7 +130,7 @@ public abstract class Assert {
      */
     public static void notNull(@Nullable Object object, String message) {
         if (object == null) {
-            throw new CustomizedException(message);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,message);
         }
     }
     public static void notNull(@Nullable Object object, RuntimeException e) {

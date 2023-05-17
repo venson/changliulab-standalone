@@ -3,7 +3,10 @@ package com.venson.changliulabstandalone.controller.admin;
 import com.venson.changliulabstandalone.entity.SecurityUser;
 import com.venson.changliulabstandalone.entity.TokenVo;
 import com.venson.changliulabstandalone.entity.vo.UserLogin;
+import com.venson.changliulabstandalone.exception.CustomizedException;
 import com.venson.changliulabstandalone.service.TokenManager;
+import com.venson.changliulabstandalone.utils.Assert;
+import com.venson.changliulabstandalone.utils.ResUtils;
 import com.venson.changliulabstandalone.utils.Result;
 import com.venson.changliulabstandalone.config.security.PasswordNotFoundBCryptEncoded;
 import com.venson.changliulabstandalone.entity.UserContextInfoBO;
@@ -13,6 +16,7 @@ import com.venson.changliulabstandalone.utils.ContextUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -37,15 +41,13 @@ public class AdminLoginController {
 
 
     @PostMapping()
-    public Result<TokenVo> login(@RequestBody UserLogin user){
+    public ResponseEntity<TokenVo> login(@RequestBody UserLogin user){
         SecurityUser securityUser = (SecurityUser) adminUserDetailsService.loadUserByUsername(user.getUsername());
         if(securityUser==null){
             passwordEncoder.matches("user not found", PasswordNotFoundBCryptEncoded.instance);
-
         }else{
             boolean matches = passwordEncoder.matches(user.getPassword(),securityUser.getPassword());
             if(matches){
-
                 UserInfoBO tokenInfoBO =securityUser.getCurrentUserInfo();
                 UserContextInfoBO userContextInfoBO = new UserContextInfoBO();
                 BeanUtils.copyProperties(tokenInfoBO,userContextInfoBO);
@@ -56,19 +58,17 @@ public class AdminLoginController {
                 // store UserContextInfoBO to redis
                 redisTemplate.opsForValue().set(redisKey, userContextInfoBO,
                         AuthConstants.EXPIRE_24H_S, TimeUnit.SECONDS);
-                return Result.success(new TokenVo(token));
+                return ResUtils.ok(new TokenVo(token,securityUser.getPermissionValueList()));
 
             }
         }
-        return Result.unAuthorized();
+        return ResUtils.unAuthorized();
     }
     @PostMapping("logout")
-    public Result<String> logout(){
+    public ResponseEntity<String> logout(){
         UserContextInfoBO userContext = ContextUtils.getUserContext();
-        if(userContext!=null){
-            tokenManager.removeToken(userContext.getToken());
-            return Result.success();
-        }
-        return Result.error();
+        Assert.notNull(userContext,new CustomizedException("Not logged in"));
+        tokenManager.removeToken(userContext.getToken());
+        return ResUtils.ok();
     }
 }

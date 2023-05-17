@@ -19,8 +19,8 @@ import com.venson.changliulabstandalone.mapper.*;
 import com.venson.changliulabstandalone.service.*;
 import com.venson.changliulabstandalone.utils.CacheUtils;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,32 +34,19 @@ import java.util.List;
 
 
 @Configuration
-public class ChapterStateMachineConfig {
+@RequiredArgsConstructor
+public class ChapterStateMachineImpl {
 
-    @Autowired
-    private StateMachineService stateMachineService;
+    private final StateMachineService stateMachineService;
+    private final EduSectionMapper sectionMapper;
+    private final EduChapterDescriptionMapper chapterDescriptionMapper;
+    private final TransactionTemplate transactionTemplate;
+    private final EduChapterMapper chapterMapper;
+    private final CacheManager cacheManager;
+    private final EduChapterPublishedDescMapper chapterPublishedDescMapper;
+    private final EduChapterPublishedMapper chapterPublishedMapper;
+    private final StateMachine<ReviewStatus, ReviewAction, ReviewApplyVo> sectionStateMachine;
 
-    @Autowired
-    private EduSectionMapper sectionMapper;
-    @Autowired
-    private EduChapterDescriptionMapper chapterDescriptionMapper;
-    @Autowired
-    private TransactionTemplate transactionTemplate;
-
-    @Autowired
-    private EduChapterMapper chapterMapper;
-
-
-
-    @Autowired
-    private CacheManager cacheManager;
-    @Autowired
-    private EduChapterPublishedDescMapper chapterPublishedDescMapper;
-    @Autowired
-    private EduChapterPublishedMapper chapterPublishedMapper;
-
-    @Autowired
-    private StateMachine<ReviewStatus, ReviewAction, ReviewApplyVo> sectionStateMachine;
 
     @Bean
     public StateMachine<ReviewStatus, ReviewAction, ReviewApplyVo> chapterStateMachine() {

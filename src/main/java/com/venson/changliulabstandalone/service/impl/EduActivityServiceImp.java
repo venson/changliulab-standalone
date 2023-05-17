@@ -2,15 +2,16 @@ package com.venson.changliulabstandalone.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulabstandalone.constant.FrontCacheConst;
+import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
+import com.venson.changliulabstandalone.entity.pojo.*;
+import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
+import com.venson.changliulabstandalone.utils.Assert;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.utils.PageUtil;
-import com.venson.changliulabstandalone.entity.pojo.EduActivity;
-import com.venson.changliulabstandalone.entity.pojo.EduActivityMarkdown;
-import com.venson.changliulabstandalone.entity.pojo.EduActivityPublished;
-import com.venson.changliulabstandalone.entity.pojo.EduActivityPublishedMd;
 import com.venson.changliulabstandalone.entity.dto.ActivityAdminDTO;
 import com.venson.changliulabstandalone.entity.dto.ActivityPreviewDTO;
 import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
@@ -26,9 +27,14 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -164,6 +170,43 @@ public class EduActivityServiceImp extends ServiceImpl<EduActivityMapper, EduAct
         eduActivityMarkdown.setId(eduActivity.getId());
         activityMarkdownService.save(eduActivityMarkdown);
         return eduActivity.getId();
+    }
+
+    @Override
+    public PageResponse<EduActivity> getPageActivityList(PageQueryVo vo) {
+            Page<EduActivity> reviewPage = new Page<>(vo.page(),vo.perPage());
+            LambdaQueryWrapper<EduActivity> wrapper = new LambdaQueryWrapper<>();
+//            wrapper.eq(EduActivity::getReview, ReviewStatus.APPLIED);
+        wrapper.select(EduActivity::getId,EduActivity::getTitle,EduActivity::getIsRemoveAfterReview
+                , EduActivity::getEnable, EduActivity::getActivityDate, EduActivity::getIsPublished
+                , EduActivity::getIsModified, EduActivity::getReview);
+            baseMapper.selectPage(reviewPage,wrapper);
+            return PageUtil.toBean(reviewPage);
+    }
+
+    @Override
+    public Map<Long, String> getIdTitleMap(List<Long> refIds) {
+        LambdaQueryWrapper<EduActivity> wrapper = Wrappers.lambdaQuery();
+        wrapper.select(EduActivity::getTitle, EduActivity::getId).in(EduActivity::getId,refIds);
+        List<EduActivity> activities = baseMapper.selectList(wrapper);
+        return activities.stream().collect(Collectors.toMap(EduActivity::getId, EduActivity::getTitle));
+    }
+
+    @Override
+    public List<ReviewBasicDTO> getInfoByReviews(List<EduReview> reviews) {
+        if(reviews.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<Long> activityIds = reviews.stream().map(EduReview::getRefId).collect(Collectors.toList());
+        Map<Long, EduActivity> activityMap = baseMapper.selectBatchIds(activityIds).stream().collect(Collectors.toMap(EduActivity::getId, Function.identity()));
+        return reviews.stream().map(review->ReviewBasicDTO.builder()
+                .id(review.getId())
+                .review(review.getStatus())
+                .title(activityMap.get(review.getRefId()).getTitle())
+                .gmtCreate(review.getGmtCreate())
+                .refId(review.getRefId())
+                .build()
+        ).collect(Collectors.toList());
     }
 
     private void copyActivityBean(ActivityAdminDTO source, EduActivity target) {

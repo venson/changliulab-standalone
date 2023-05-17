@@ -9,4 +9,7 @@ public interface AuthPathAdapter {
      List<PathPattern> patternWhiteList();
 
      List<PathPattern> patternDocList();
+
+     boolean checkWhiteList(String url);
+     boolean checkPatternList(String url);
 }

@@ -20,9 +20,8 @@ import com.venson.changliulabstandalone.mapper.*;
 import com.venson.changliulabstandalone.service.*;
 import com.venson.changliulabstandalone.utils.CacheUtils;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,26 +33,22 @@ import org.springframework.util.ObjectUtils;
 
 
 @Configuration
-public class SectionStateMachineConfig {
+@RequiredArgsConstructor
+public class SectionStateMachineImpl {
 
 
-    @Autowired
-    private TransactionTemplate transactionTemplate;
-    @Autowired
-    private EduSectionMarkdownMapper markdownMapper;
+    private final TransactionTemplate transactionTemplate;
+    private final EduSectionMarkdownMapper markdownMapper;
 
-    @Autowired
-    private EduSectionPublishedMapper publishedMapper;
-    @Autowired
-    private EduSectionPublishedMdMapper publishedMdMapper;
+    private final EduSectionPublishedMapper publishedMapper;
+    private final EduSectionPublishedMdMapper publishedMdMapper;
 
-    @Autowired
-    private EduSectionMapper sectionMapper;
+    private final EduSectionMapper sectionMapper;
 
-    @Autowired
-    private StateMachineService stateMachineService;
-    @Autowired
-    private CacheManager cacheManager;
+    private final StateMachineService stateMachineService;
+    private final CacheManager cacheManager;
+
+
     @Bean
     public StateMachine<ReviewStatus, ReviewAction, ReviewApplyVo> sectionStateMachine() {
         StateMachineBuilder<ReviewStatus, ReviewAction, ReviewApplyVo> builder = StateMachineBuilderFactory.create();

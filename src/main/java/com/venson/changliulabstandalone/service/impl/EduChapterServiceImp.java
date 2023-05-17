@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulabstandalone.entity.dto.ChapterContentDTO;
+import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
 import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
 import com.venson.changliulabstandalone.entity.pojo.EduChapter;
 import com.venson.changliulabstandalone.entity.pojo.EduChapterDescription;
+import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.entity.pojo.EduSection;
 import com.venson.changliulabstandalone.entity.vo.CourseTreeNodeVo;
 import com.venson.changliulabstandalone.entity.front.dto.ChapterFrontDTO;
@@ -15,7 +17,9 @@ import com.venson.changliulabstandalone.exception.CustomizedException;
 import com.venson.changliulabstandalone.mapper.EduChapterMapper;
 import com.venson.changliulabstandalone.service.admin.EduChapterDescriptionService;
 import com.venson.changliulabstandalone.service.admin.EduChapterService;
+import com.venson.changliulabstandalone.service.admin.EduCourseService;
 import com.venson.changliulabstandalone.service.admin.EduSectionService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,23 +41,17 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class EduChapterServiceImp extends ServiceImpl<EduChapterMapper, EduChapter> implements EduChapterService {
 
 
-    @Autowired
-    private EduChapterDescriptionService descService;
+    private final EduChapterDescriptionService descService;
 
-    @Autowired
-    private EduSectionService sectionService;
+    private final EduSectionService sectionService;
 
-    @Autowired
-    private Comparator<ReviewStatus> reviewComparator;
-    @Autowired
-    private Comparator<ReviewStatus> viewComparator;
-
-    public EduChapterServiceImp(EduChapterDescriptionService desService) {
-        this.descService = desService;
-    }
+    private final Comparator<ReviewStatus> reviewComparator;
+    private final Comparator<ReviewStatus> viewComparator;
+//    private final EduCourseService courseService;
 
 
     @Override
@@ -183,6 +181,20 @@ public class EduChapterServiceImp extends ServiceImpl<EduChapterMapper, EduChapt
 
         return courseIdChapterReviewMap;
     }
+
+//    @Override
+//    public Collection<? extends ReviewBasicDTO> getInfoByReviews(List<EduReview> values) {
+//        List<Long> chapterIdsList = values.stream().map(EduReview::getRefId).toList();
+//        LambdaQueryWrapper<EduChapter> chapterWrapper = Wrappers.lambdaQuery();
+//        chapterWrapper.in(EduChapter::getId,chapterIdsList).select(EduChapter::getId,EduChapter::getTitle, EduChapter::getCourseId);
+//        // get all chapters
+//        List<EduChapter> chapterList = baseMapper.selectList(chapterWrapper);
+//
+//
+//        courseService.listByIds(chapterIdsList);
+//
+//        return null;
+//    }
 
 
 }

@@ -4,7 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulabstandalone.constant.FrontCacheConst;
+import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
+import com.venson.changliulabstandalone.entity.pojo.EduResearch;
+import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.entity.vo.admin.AdminMethodologyVo;
+import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
 import com.venson.changliulabstandalone.utils.Assert;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.utils.PageUtil;
@@ -20,6 +24,14 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -91,7 +103,7 @@ public class EduMethodologyServiceImp extends ServiceImpl<EduMethodologyMapper, 
 
         EduMethodology eduMethodology = baseMapper.selectById(id);
         Assert.notNull(eduMethodology, "No corresponding methodology");
-        Assert.isTrue(eduMethodology.getReview() == ReviewStatus.APPLIED,"Methodology is under review");
+        Assert.isTrue(!ReviewStatus.APPLIED.equals(eduMethodology.getReview()),"Methodology is under review");
         Assert.isTrue(checkTitleUsable(methodology.title(),id),"Duplicated Methodology title" );
         BeanUtils.copyProperties(methodology, eduMethodology);
         baseMapper.updateById(eduMethodology);
@@ -127,6 +139,44 @@ public class EduMethodologyServiceImp extends ServiceImpl<EduMethodologyMapper, 
         eduMethodology.setIsPublic(!eduMethodology.getIsPublic());
         baseMapper.updateById(eduMethodology);
 
+    }
+
+    @Override
+    public PageResponse<EduMethodology> getMethodologyPage(PageQueryVo vo) {
+        Page<EduMethodology> methodologyPage = new Page<>(vo.page(), vo.perPage());
+        LambdaQueryWrapper<EduMethodology> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(EduMethodology::getId, EduMethodology::getTitle,
+                EduMethodology::getEnable,EduMethodology::getIsPublic,EduMethodology::getReview,
+                EduMethodology::getIsPublished, EduMethodology::getIsModified, EduMethodology::getIsRemoveAfterReview);
+        baseMapper.selectPage(methodologyPage, wrapper);
+        return PageUtil.toBean(methodologyPage);
+    }
+
+    @Override
+    @Transactional
+    public void removeMethodologyById(Long id) {
+        EduMethodology eduMethodology = baseMapper.selectById(id);
+        Assert.notNull(eduMethodology,"Methodology no found");
+        eduMethodology.setIsRemoveAfterReview(!eduMethodology.getIsRemoveAfterReview());
+        baseMapper.updateById(eduMethodology);
+    }
+
+    @Override
+    public Collection<? extends ReviewBasicDTO> getInfoByReviews(List<EduReview> reviews) {
+
+        if(reviews.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<Long> methodologyIds= reviews.stream().map(EduReview::getRefId).collect(Collectors.toList());
+        Map<Long, EduMethodology> methodologyMap = baseMapper.selectBatchIds(methodologyIds).stream().collect(Collectors.toMap(EduMethodology::getId, Function.identity()));
+        return reviews.stream().map(review->ReviewBasicDTO.builder()
+                .id(review.getId())
+                .review(review.getStatus())
+                .title(methodologyMap.get(review.getRefId()).getTitle())
+                .gmtCreate(review.getGmtCreate())
+                .refId(review.getRefId())
+                .build()
+        ).collect(Collectors.toList());
     }
 
     private boolean checkTitleUsable(@NotNull  String title, @Nullable Long id) {

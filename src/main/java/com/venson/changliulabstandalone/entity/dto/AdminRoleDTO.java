@@ -3,9 +3,10 @@ package com.venson.changliulabstandalone.entity.dto;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
-public class AdminRolePermissionDTO implements Serializable {
+public class AdminRoleDTO implements Serializable {
 
     private Long id;
 
@@ -13,10 +14,11 @@ public class AdminRolePermissionDTO implements Serializable {
 
     private String roleCode;
 
+    private Boolean enable;
+
     private String remark;
 
-    private Long[] permissionIds;
+    private List<Long> permissionIds;
 
-    private Boolean permissionChanged;
 
 }

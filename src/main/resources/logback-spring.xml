@@ -129,7 +129,7 @@
     <logger name="org.thymeleaf" level="INFO"/>
     <root>
         <appender-ref ref="dailyRollingFileAppender"/>
-<!--        <appender-ref ref="CONSOLE"/>-->
+        <appender-ref ref="CONSOLE"/>
         <!--        <appender-ref ref="FILE_DEBUG"/>-->
         <!--        <appender-ref ref="FILE_ERROR"/>-->
     </root>

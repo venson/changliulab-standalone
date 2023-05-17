@@ -1,4 +1,6 @@
 package com.venson.changliulabstandalone.entity;
 
-public record TokenVo(String token) {
+import java.util.List;
+
+public record TokenVo(String token, List<String> permissions ) {
 }

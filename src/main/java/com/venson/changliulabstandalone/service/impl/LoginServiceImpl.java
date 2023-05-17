@@ -4,7 +4,9 @@ import com.venson.changliulabstandalone.config.security.PasswordNotFoundBCryptEn
 import com.venson.changliulabstandalone.constant.AdminCacheConst;
 import com.venson.changliulabstandalone.entity.*;
 import com.venson.changliulabstandalone.entity.dto.MenuDTO;
+import com.venson.changliulabstandalone.entity.dto.PermissionDTO;
 import com.venson.changliulabstandalone.entity.dto.UserInfoDTO;
+import com.venson.changliulabstandalone.entity.dto.UserPermissionsDTO;
 import com.venson.changliulabstandalone.entity.enums.UserType;
 import com.venson.changliulabstandalone.entity.pojo.*;
 import com.venson.changliulabstandalone.entity.vo.UserLogin;
@@ -24,16 +26,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,56 +71,19 @@ public class LoginServiceImpl implements LoginService {
         this.frontUserService = frontUserService;
     }
 
-//    /**
-//     * 根据用户名获取用户登录信息
-//     *
-//     */
-//    public UserInfoDTO getUserInfo(Long id) {
-//        AdminUser user = adminUserService.getById(id);
-//        Assert.notNull(user, "Invalid User");
-//        //根据用户id获取角色
-//        List<AdminRole> adminRoleList = adminRoleService.selectRoleByUserId(id);
-//        List<String> roleNameList = adminRoleList.stream().map(AdminRole::getRoleName).collect(Collectors.toList());
-//        if(roleNameList.size() == 0) {
-//            //前端框架必须返回一个角色，否则报错，如果没有角色，返回一个空角色
-//            roleNameList.add("");
-//        }
-//
-//        //根据用户id获取操作权限值
-//        List<String> permissionValueList = adminPermissionService.selectPermissionValueByUserId(id);
-//        redisTemplate.opsForValue().set(user.getUsername(), permissionValueList);
-//
-////        List<JSONObject> permissionList = getMenu(id);
-////        List<JSONObject> permissionList = null;
-//
-//        return new UserInfoDTO(user.getId(),user.getUsername(),user.getAvatar(),roleNameList,permissionValueList, null);
-//
-//    }
-
-    /**
-     * 根据用户名获取动态菜单
-     */
-//    public List<JSONObject> getMenu(String username) {
-//        AdminUser user = adminUserService.selectByUsername(username);
-//
-//        //根据用户id获取用户菜单权限
-//        return adminPermissionService.selectPermissionByUserId(user.getId());
-//    }
 
 
     @Override
-    @Cacheable(value = AdminCacheConst.USER_MENU_NAME, key = "#id")
-    public List<MenuDTO> getAdminMenu(Long id) {
-        List<AdminPermission> allMenus = adminPermissionService.getAllPermissions(false);
-        List<Long> permissionIds = adminPermissionService.getMenuPermissionIdsByUserId(id);
+    @Cacheable(value = AdminCacheConst.USER_MENU_NAME, key = "#result.id")
+    public UserPermissionsDTO getPermissionsById() {
 
-
-        HashMap<Long, MenuDTO> menuMap = new HashMap<>();
-        Map<Long, AdminPermission> allMenusMap = allMenus.stream().collect(Collectors.toMap(AdminPermission::getId, Function.identity()));
-//        allPermissions.forEach(o->allPermissionsMap.put(o.getId(),o));
-        permissionIds.forEach(o->createMenu(allMenusMap,menuMap,o));
-        return new ArrayList<>(menuMap.values());
-//        return adminPermissionService.doGetMenus(id);
+        UserContextInfoBO userContext = ContextUtils.getUserContext();
+        Assert.notNull(userContext,new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        List<String> permissionValueList = userContext.getPermissionValueList();
+        UserPermissionsDTO dto = new UserPermissionsDTO();
+        dto.setId(userContext.getId());
+        dto.setPermissions(permissionValueList);
+        return dto;
     }
 
     @Override
@@ -127,7 +91,7 @@ public class LoginServiceImpl implements LoginService {
     public UserInfoDTO getAdminUserInfo(Long id) {
 
         AdminUser user = adminUserService.getById(id);
-        Assert.notNull(user, "Invalid User");
+        Assert.notNull(user,new ResponseStatusException(HttpStatus.UNAUTHORIZED));
         //根据用户id获取角色
         List<AdminRole> adminRoleList = adminRoleService.selectRoleByUserId(id);
         List<String> roleNameList = adminRoleList.stream().map(AdminRole::getRoleName).collect(Collectors.toList());
@@ -195,7 +159,7 @@ public class LoginServiceImpl implements LoginService {
                 // store UserContextInfoBO to redis
                 redisTemplate.opsForValue().set(redisKey, userContextInfoBO,
                         AuthConstants.EXPIRE_24H_S, TimeUnit.SECONDS);
-                return new TokenVo(token);
+                return new TokenVo(token,securityUser.getPermissionValueList());
             }
         }
         return null;
@@ -210,30 +174,4 @@ public class LoginServiceImpl implements LoginService {
     }
 
 
-    private void createMenu(Map<Long, AdminPermission> map,Map<Long, MenuDTO> resultMap, Long id){
-        AdminPermission permission = map.get(id);
-        if(permission ==null){
-            return;
-        }
-        if(permission.getPid()==1 && resultMap.containsKey(id)) {
-            return;
-        }
-        MenuDTO menu = new MenuDTO();
-        menu.setPath(permission.getPath());
-        menu.setName("name_"+ permission.getId());
-        menu.setComponent(permission.getComponent());
-        menu.setMeta(new MenuMeta(permission.getName(), permission.getType()==2, permission.getIcon()));
-        if(permission.getPid()==1){
-            resultMap.put(permission.getId(),menu);
-        } else if (permission.getType() == 1) {
-            createMenu(map,resultMap, permission.getPid());
-            resultMap.get(permission.getPid()).getChildren().add(menu);
-        }else if(permission.getType()==2){
-//            AdminPermission parentPermission = map.get(permission.getPid());
-            Long grandParent = map.get(permission.getPid()).getPid();
-            createMenu(map,resultMap,grandParent);
-
-            resultMap.get(grandParent).getChildren().add(menu);
-        }
-    }
 }

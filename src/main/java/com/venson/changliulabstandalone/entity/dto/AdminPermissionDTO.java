@@ -1,5 +1,6 @@
 package com.venson.changliulabstandalone.entity.dto;
 
+import com.venson.changliulabstandalone.entity.enums.PermissionAction;
 import lombok.Data;
 
 import java.io.Serial;
@@ -21,28 +22,15 @@ public class AdminPermissionDTO implements Serializable {
 
     private Long id;
 
-    private Long pid;
+    private String category;
+    private PermissionAction action;
 
     private String name;
 
-//    //    0, 根菜单，1菜单，2 按钮
-//    private Integer type;
+    private String slug;
 
-    private String permissionValue;
+    private String description;
 
-    private String path;
-
-    private String component;
-
-    private String icon;
-
-////    0: abandon 1:normal
-//    private Integer status;
-    private Integer level;
-
-    private List<AdminPermissionDTO> children;
-
-    private boolean isSelect;
 
 
 

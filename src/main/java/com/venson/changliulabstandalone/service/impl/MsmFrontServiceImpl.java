@@ -33,7 +33,6 @@ public class MsmFrontServiceImpl implements MsmFrontService {
         int count;
         String code;
         String emailUrlCount = emailUrl + ":count";
-        log.info("changliulabstandalone Code to Email:" + emailUrl);
         String oldCode = redisTemplate.opsForValue().get(emailUrl);
         String countString = redisTemplate.opsForValue().get(emailUrlCount);
         if(StringUtils.hasText(countString)){
@@ -52,8 +51,9 @@ public class MsmFrontServiceImpl implements MsmFrontService {
             code = RandomString.randomCode();
         }
         try {
-            msmService.sendCode(emailUrl, code,"changliulabstandalone Code",
-                    "Registration changliulabstandalone Code",20);
+            log.info("changliulabstandalone Code to Email:" + emailUrl);
+            msmService.sendCode(emailUrl, code,"changliulab security Code",
+                    "Registration changliulab security Code",5);
             redisTemplate.opsForValue().set(emailUrl, code, 5, TimeUnit.MINUTES);
         } catch (MessagingException e) {
             throw new CustomizedException(30000, "Email sent failed");

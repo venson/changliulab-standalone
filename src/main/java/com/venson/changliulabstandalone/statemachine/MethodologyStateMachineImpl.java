@@ -18,7 +18,7 @@ import com.venson.changliulabstandalone.service.StateMachineService;
 import com.venson.changliulabstandalone.utils.Assert;
 import com.venson.changliulabstandalone.utils.CacheUtils;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,18 +30,16 @@ import org.springframework.util.ObjectUtils;
 
 
 @Service
-public class MethodologyStateMachineConfig {
+@RequiredArgsConstructor
+public class MethodologyStateMachineImpl {
 
-    @Autowired
-    private CacheManager cacheManager;
+    private final CacheManager cacheManager;
 
-    @Autowired
-    private TransactionTemplate transactionTemplate;
-    @Autowired
-    private StateMachineService stateMachineService;
+    private final TransactionTemplate transactionTemplate;
+    private final StateMachineService stateMachineService;
 
-    @Autowired
-    private EduMethodologyMapper methodologyMapper;
+    private final EduMethodologyMapper methodologyMapper;
+
 
     @Bean
     public StateMachine<ReviewStatus, ReviewAction, ReviewApplyVo> methodologyStateMachine() {
@@ -68,7 +66,7 @@ public class MethodologyStateMachineConfig {
 
         return builder.build(StateMachineConstant.METHODOLOGY_STATE_MACHINE_ID);
     }
-    @PreAuthorize("hasAuthority('methodology.review.apply')")
+    @PreAuthorize("hasAuthority('Methodology.review.apply')")
     private Condition<ReviewApplyVo> requestNoneMethodologyCon() {
         return (ctx) -> {
             EduMethodology methodology = methodologyMapper.selectById(ctx.getId());
@@ -92,7 +90,7 @@ public class MethodologyStateMachineConfig {
     }
 
 
-    @PreAuthorize("hasAuthority('methodology.review.reject')")
+    @PreAuthorize("hasAuthority('Methodology.review.reject')")
     private Condition<ReviewApplyVo> requestRejectMethodologyCon() {
         return (ctx) -> {
             EduMethodology methodology = methodologyMapper.selectById(ctx.getId());

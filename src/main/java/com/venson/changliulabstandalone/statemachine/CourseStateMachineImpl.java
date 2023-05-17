@@ -19,8 +19,8 @@ import com.venson.changliulabstandalone.mapper.*;
 import com.venson.changliulabstandalone.service.StateMachineService;
 import com.venson.changliulabstandalone.utils.CacheUtils;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,31 +33,23 @@ import org.springframework.util.ObjectUtils;
 import java.util.List;
 
 @Configuration
-public class CourseStateMachineConfig {
+@RequiredArgsConstructor
+public class CourseStateMachineImpl {
 
-    @Autowired
-    private StateMachineService stateMachineService;
+    private final StateMachineService stateMachineService;
 
-    @Autowired
-    private EduCourseDescriptionMapper courseDescMapper;
-    @Autowired
-    private EduCoursePublishedMapper coursePublishedMapper;
-    @Autowired
-    private EduCourseDescriptionPublishedMapper courseDescPublishedMapper;
+    private final EduCourseDescriptionMapper courseDescMapper;
+    private final EduCoursePublishedMapper coursePublishedMapper;
+    private final EduCourseDescriptionPublishedMapper courseDescPublishedMapper;
 
-    @Autowired
-    private TransactionTemplate transactionTemplate;
+    private final TransactionTemplate transactionTemplate;
 
-    @Autowired
-    private EduChapterMapper chapterMapper;
-    @Autowired
-    private EduCourseMapper courseMapper;
+    private final EduChapterMapper chapterMapper;
+    private final EduCourseMapper courseMapper;
 
-    @Autowired
-    private CacheManager cacheManager;
+    private final CacheManager cacheManager;
 
-    @Autowired
-    private StateMachine<ReviewStatus, ReviewAction, ReviewApplyVo> chapterStateMachine;
+    private final StateMachine<ReviewStatus, ReviewAction, ReviewApplyVo> chapterStateMachine;
 
 
     @Bean

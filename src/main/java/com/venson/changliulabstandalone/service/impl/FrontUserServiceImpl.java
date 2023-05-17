@@ -146,7 +146,7 @@ public class FrontUserServiceImpl extends ServiceImpl<FrontUserMapper, FrontUser
     }
 
     @Override
-    @Cacheable(value = FrontCacheConst.USE_NAME,key =FrontCacheConst.USE_FRONT_KEY +"+#userId")
+    @Cacheable(value = FrontCacheConst.USER_NAME,key =FrontCacheConst.USER_FRONT_KEY +"+#userId")
     public FrontUserDTO getFrontUserById(Long userId) {
         LambdaQueryWrapper<FrontUser> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(FrontUser::getId, userId)

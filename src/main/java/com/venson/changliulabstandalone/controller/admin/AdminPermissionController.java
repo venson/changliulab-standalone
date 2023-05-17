@@ -1,11 +1,17 @@
 package com.venson.changliulabstandalone.controller.admin;
 
 
+import com.venson.changliulabstandalone.entity.dto.AdminPermissionTree;
+import com.venson.changliulabstandalone.entity.dto.BasicListDTO;
 import com.venson.changliulabstandalone.entity.pojo.AdminPermission;
 import com.venson.changliulabstandalone.entity.dto.AdminPermissionDTO;
+import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
 import com.venson.changliulabstandalone.service.admin.AdminPermissionService;
-import com.venson.changliulabstandalone.utils.Result;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.venson.changliulabstandalone.utils.PageResponse;
+import com.venson.changliulabstandalone.utils.ResUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,46 +26,60 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/auth/admin/permission")
+@RequiredArgsConstructor
 public class AdminPermissionController {
 
-    @Autowired
-    private AdminPermissionService adminPermissionService;
+    private final AdminPermissionService adminPermissionService;
 
 
+    @GetMapping("permissions")
+    @PreAuthorize("hasAuthority('Permission.READ')")
+    public ResponseEntity<BasicListDTO<AdminPermissionTree>> getAllPermissionTree() {
+        List<AdminPermissionTree>  tree=  adminPermissionService.doGetAllPermission();
+        return ResUtils.ok(BasicListDTO.of(tree));
+    }
     @GetMapping
-    public Result<List<AdminPermissionDTO>> getAllPermissionTree() {
-        List<AdminPermissionDTO> list =  adminPermissionService.doGetAllPermissionTree();
-        return Result.success(list);
+    @PreAuthorize("hasAuthority('Permission.READ')")
+    public ResponseEntity<PageResponse<AdminPermission>> getPage(PageQueryVo vo) {
+        PageResponse<AdminPermission>  page=  adminPermissionService.getPage(vo);
+        return ResUtils.ok(page);
     }
 
     @DeleteMapping("{id}")
-    public Result<String> removePermissionById(@PathVariable Long id) {
-        adminPermissionService.doRemovePermissionById(id);
-        return Result.success();
+    @PreAuthorize("hasAuthority('Permission.REMOVE')")
+    public ResponseEntity<AdminPermission> removePermissionById(@PathVariable Long id) {
+        AdminPermission adminPermission = adminPermissionService.doRemovePermissionById(id);
+        return ResUtils.ok(adminPermission);
     }
 
 
     @GetMapping("{roleId}")
-    public Result<List<Long>> getPermissionsByRoleId(@PathVariable Long roleId) {
+    @PreAuthorize("hasAuthority('Permission.READ')")
+    public ResponseEntity<List<Long>> getPermissionsByRoleId(@PathVariable Long roleId) {
         List<Long> list = adminPermissionService.doGetPermissionsIdsByRoleId(roleId);
-        List<Long> ignoreList = adminPermissionService.getIgnorePermissionIds();
-        list.removeAll(ignoreList);
-        return Result.success(list);
+        return ResUtils.ok(list);
+    }
+
+    @GetMapping("alive")
+    public ResponseEntity<String> checkAlive(){
+        return ResUtils.ok();
     }
 
 
 
     @PostMapping()
-    public Result<String> addPermission(@RequestBody AdminPermissionDTO permission) {
-        adminPermissionService.addPermission(permission);
-        return Result.success();
+    @PreAuthorize("hasAuthority('Permission.CREATE')")
+    public ResponseEntity<Long> addPermission(@RequestBody AdminPermissionDTO permission) {
+        Long id = adminPermissionService.addPermission(permission);
+        return ResUtils.ok(id);
     }
 
     @PutMapping("{id}")
-    public Result<String> updatePermission(@PathVariable Long id,@RequestBody AdminPermission adminPermission) {
+    @PreAuthorize("hasAuthority('Permission.EDIT')")
+    public ResponseEntity<String> updatePermission(@PathVariable Long id,@RequestBody AdminPermission adminPermission) {
         adminPermissionService.doUpdatePermission(id,adminPermission);
 //        adminPermissionService.updateById(adminPermission);
-        return Result.success();
+        return ResUtils.ok();
     }
 
 }

@@ -1,16 +1,18 @@
 package com.venson.changliulabstandalone.controller.admin;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.venson.changliulabstandalone.entity.pojo.AdminRole;
-import com.venson.changliulabstandalone.entity.dto.AdminRolePermissionDTO;
+import com.venson.changliulabstandalone.entity.dto.AdminRoleDTO;
+import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
 import com.venson.changliulabstandalone.service.admin.AdminRoleService;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.utils.PageUtil;
-import com.venson.changliulabstandalone.utils.Result;
+import com.venson.changliulabstandalone.utils.ResUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,22 +28,22 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/auth/admin/role")
+@RequiredArgsConstructor
 public class AdminRoleController {
 
-    @Autowired
-    private AdminRoleService adminRoleService;
+    private final AdminRoleService adminRoleService;
 
     @GetMapping()
-    public Result<List<AdminRole>> getAllRoles(){
-        LambdaQueryWrapper<AdminRole> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(AdminRole::getId,AdminRole::getRoleName,AdminRole::getRoleCode);
-        List<AdminRole> list = adminRoleService.list(wrapper);
-        return Result.success(list);
+    @PreAuthorize("hasAuthority('Role.READ')")
+    public ResponseEntity<PageResponse<AdminRole>> getPage(PageQueryVo vo){
+        PageResponse<AdminRole> pages =  adminRoleService.getPage(vo);
+        return ResUtils.ok(pages);
 
     }
 
     @GetMapping("{page}/{limit}")
-    public Result<PageResponse<AdminRole>> index(
+    @PreAuthorize("hasAuthority('Role.READ')")
+    public ResponseEntity<PageResponse<AdminRole>> index(
             @PathVariable Long page,
             @PathVariable Long limit,
             AdminRole adminRole) {
@@ -52,37 +54,42 @@ public class AdminRoleController {
         }
         adminRoleService.page(pageParam,wrapper);
         PageResponse<AdminRole> pageRes = PageUtil.toBean(pageParam);
-        return Result.success(pageRes);
+        return ResUtils.ok(pageRes);
     }
 
     @GetMapping("{id}")
-    public Result<AdminRole> get(@PathVariable Long id) {
-        AdminRole adminRole = adminRoleService.getById(id);
-        return Result.success(adminRole);
+    @PreAuthorize("hasAuthority('Role.READ')")
+    public ResponseEntity<AdminRoleDTO> get(@PathVariable Long id) {
+        AdminRoleDTO role = adminRoleService.getRoleById(id);
+//        AdminRole adminRole = adminRoleService.getById(id);
+        return ResUtils.ok(role);
     }
 
     @PostMapping()
-    public Result<String> addRole(@RequestBody AdminRolePermissionDTO rolePermissionDTO) {
-        adminRoleService.addRoleWithPermissions(rolePermissionDTO);
-        return Result.success();
+    @PreAuthorize("hasAuthority('Role.CREATE')")
+    public ResponseEntity<Long> addRole(@RequestBody AdminRoleDTO rolePermissionDTO) {
+        Long id = adminRoleService.addRoleWithPermissions(rolePermissionDTO);
+        return ResUtils.ok(id);
     }
 
-    @PutMapping()
-    public Result<String> updateById(@RequestBody AdminRolePermissionDTO rolePermissionDTO) {
+    @PutMapping("{id}")
+    @PreAuthorize("hasAuthority('Role.EDIT')")
+    public ResponseEntity<String> updateById(@RequestBody AdminRoleDTO rolePermissionDTO) {
         adminRoleService.updateRoleWithPermissions(rolePermissionDTO);
-        return Result.success();
+        return ResUtils.ok();
     }
 
     @DeleteMapping("{id}")
-    public Result<String> remove(@PathVariable Long id) {
+    @PreAuthorize("hasAuthority('Role.REMOVE')")
+    public ResponseEntity<String> remove(@PathVariable Long id) {
         adminRoleService.removeRoleById(id);
-        return Result.success();
+        return ResUtils.ok();
     }
 
-    @DeleteMapping("batchRemove")
-    public Result<String> batchRemove(@RequestBody List<String> idList) {
-        adminRoleService.removeByIds(idList);
-        return Result.success();
-    }
+//    @DeleteMapping("batchRemove")
+//    public ResponseEntity<String> batchRemove(@RequestBody List<String> idList) {
+//        adminRoleService.removeByIds(idList);
+//        return ResUtils.ok();
+//    }
 }
 

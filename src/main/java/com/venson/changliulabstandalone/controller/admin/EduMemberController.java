@@ -1,19 +1,15 @@
 package com.venson.changliulabstandalone.controller.admin;
 
-import com.venson.changliulabstandalone.entity.vo.admin.AdminMemberPageVo;
+import com.venson.changliulabstandalone.entity.dto.MemberQuery;
+import com.venson.changliulabstandalone.entity.pojo.EduMember;
+import com.venson.changliulabstandalone.entity.vo.MemberVo;
 import com.venson.changliulabstandalone.entity.vo.admin.AdminMemberVo;
 import com.venson.changliulabstandalone.entity.vo.admin.ListQueryParams;
+import com.venson.changliulabstandalone.service.admin.EduMemberService;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.utils.ResUtils;
-import com.venson.changliulabstandalone.utils.Result;
-import com.venson.changliulabstandalone.entity.pojo.EduMember;
-import com.venson.changliulabstandalone.entity.dto.MemberQuery;
-import com.venson.changliulabstandalone.entity.vo.MemberVo;
-import com.venson.changliulabstandalone.service.admin.EduMemberService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;

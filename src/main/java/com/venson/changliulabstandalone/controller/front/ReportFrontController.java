@@ -1,9 +1,7 @@
 package com.venson.changliulabstandalone.controller.front;
 
-import com.venson.changliulabstandalone.entity.EduReport;
 import com.venson.changliulabstandalone.entity.EduReportPublished;
 import com.venson.changliulabstandalone.entity.front.dto.ReportFrontDTO;
-import com.venson.changliulabstandalone.entity.pojo.EduResearch;
 import com.venson.changliulabstandalone.service.EduReportPublishedService;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.utils.Result;

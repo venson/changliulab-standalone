@@ -110,12 +110,7 @@ public class EduReviewServiceImp extends ServiceImpl<EduReviewMapper, EduReview>
         baseMapper.selectPage(page,wrapper);
         BeanUtils.copyProperties(page,pageNew,"records");
         List<ReviewBasicDTO> data = handleReviews(page.getRecords());
-        data.sort(new Comparator<ReviewBasicDTO>() {
-            @Override
-            public int compare(ReviewBasicDTO o1, ReviewBasicDTO o2) {
-                return Long.compare(o2.getId() ,o1.getId());
-            }
-        });
+        data.sort((o1, o2) -> Long.compare(o2.getId() ,o1.getId()));
         pageNew.setRecords(data);
 
         return PageUtil.toBean(pageNew);

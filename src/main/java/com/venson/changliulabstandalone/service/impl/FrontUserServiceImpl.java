@@ -16,9 +16,9 @@ import com.venson.changliulabstandalone.service.front.FrontUserService;
 import com.venson.changliulabstandalone.service.MsmService;
 import com.venson.changliulabstandalone.utils.RandomString;
 import jakarta.mail.MessagingException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,20 +37,17 @@ import org.springframework.util.StringUtils;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FrontUserServiceImpl extends ServiceImpl<FrontUserMapper, FrontUser> implements FrontUserService {
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
 
-    @Autowired
-    private MsmService msmService;
+    private final MsmService msmService;
 
-    @Autowired
-    private AdminUserService adminUserService;
+    private final AdminUserService adminUserService;
 
 
 

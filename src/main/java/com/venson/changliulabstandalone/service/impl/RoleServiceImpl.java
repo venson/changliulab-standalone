@@ -1,22 +1,21 @@
 package com.venson.changliulabstandalone.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulabstandalone.constant.AdminCacheConst;
+import com.venson.changliulabstandalone.entity.dto.AdminRoleDTO;
 import com.venson.changliulabstandalone.entity.pojo.AdminRole;
 import com.venson.changliulabstandalone.entity.pojo.AdminRolePermission;
 import com.venson.changliulabstandalone.entity.pojo.AdminUserRole;
-import com.venson.changliulabstandalone.entity.dto.AdminRoleDTO;
 import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
 import com.venson.changliulabstandalone.mapper.AdminRoleMapper;
 import com.venson.changliulabstandalone.service.admin.AdminPermissionService;
 import com.venson.changliulabstandalone.service.admin.AdminRolePermissionService;
 import com.venson.changliulabstandalone.service.admin.AdminRoleService;
 import com.venson.changliulabstandalone.service.admin.AdminUserRoleService;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.utils.PageUtil;
 import io.jsonwebtoken.lang.Assert;
@@ -27,7 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**

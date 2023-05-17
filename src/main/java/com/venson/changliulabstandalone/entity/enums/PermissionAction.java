@@ -17,11 +17,12 @@ public enum PermissionAction implements IEnum<Integer> {
     PUBLIC(22),
     ;
 
+
     PermissionAction(int value){this.value = value;}
     @Override
     public Integer getValue() {
         return value;
     }
 
-    private int value;
+    private final int value;
 }

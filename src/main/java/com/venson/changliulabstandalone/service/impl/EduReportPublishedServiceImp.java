@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.venson.changliulabstandalone.constant.FrontCacheConst;
-import com.venson.changliulabstandalone.entity.EduReport;
 import com.venson.changliulabstandalone.entity.EduReportPublished;
 import com.venson.changliulabstandalone.entity.EduReportPublishedMd;
 import com.venson.changliulabstandalone.entity.front.dto.ReportFrontDTO;

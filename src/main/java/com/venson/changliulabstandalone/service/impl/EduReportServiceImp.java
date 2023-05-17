@@ -11,7 +11,6 @@ import com.venson.changliulabstandalone.entity.dto.AdminReportPreviewDTO;
 import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
 import com.venson.changliulabstandalone.entity.enums.PageType;
 import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
-import com.venson.changliulabstandalone.entity.pojo.EduResearch;
 import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.mapper.EduReportMapper;
 import com.venson.changliulabstandalone.service.EduReportMarkdownService;

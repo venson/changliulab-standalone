@@ -11,8 +11,7 @@ public class ActivityFrontDTO implements Serializable {
     private static final long serialVersionUID=29384987347L;
     private Long id;
     private String title;
-    private String markdown;
-    private String html;
+    private String htmlBrBase64;
     private String activityDate;
     private String authorMemberName;
 }

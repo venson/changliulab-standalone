@@ -6,10 +6,12 @@ import com.venson.changliulabstandalone.exception.CustomizedException;
 import com.venson.changliulabstandalone.service.MsmService;
 import com.venson.changliulabstandalone.utils.ContextUtils;
 import com.venson.changliulabstandalone.utils.RandomString;
+import com.venson.changliulabstandalone.utils.ResUtils;
 import com.venson.changliulabstandalone.utils.Result;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,11 +34,11 @@ public class MsmController {
     }
 
     @PostMapping(value = "securityCode")
-    public Result<String> sendEmail(@RequestBody String emailUrl){
+    public ResponseEntity<String> sendEmail(@RequestBody String emailUrl){
         log.info("changliulabstandalone Code to Email:" + emailUrl);
         Long expireTime = redisTemplate.getExpire(emailUrl, TimeUnit.MINUTES);
         if(expireTime!=null && expireTime>= 1){
-            return Result.error("Please Wait");
+            throw new CustomizedException(20001, "Code expired");
         }
         String code = RandomString.randomCode();
         try {
@@ -46,10 +48,10 @@ public class MsmController {
         } catch (MessagingException e) {
             throw new CustomizedException(30000, "Email sent failed");
         }
-        return Result.success();
+        return ResUtils.ok();
     }
     @PostMapping(value = "resetPassword")
-    public Result<String> resetEmail(@RequestBody ResetPasswordVo passwordVo){
+    public ResponseEntity<String> resetEmail(@RequestBody ResetPasswordVo passwordVo){
         UserContextInfoBO userContext = ContextUtils.getUserContext();
         Assert.notNull(userContext,"Invalid user");
         Assert.isTrue(userContext.getEmail().equals(passwordVo.getEmail()),"Email not match");
@@ -61,6 +63,6 @@ public class MsmController {
 
             throw new CustomizedException(30000, "Email sent failed");
         }
-        return Result.success();
+        return ResUtils.ok();
     }
 }

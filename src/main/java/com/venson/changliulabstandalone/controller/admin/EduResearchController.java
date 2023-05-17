@@ -1,15 +1,18 @@
 package com.venson.changliulabstandalone.controller.admin;
 
 import com.venson.changliulabstandalone.entity.dto.AdminResearchDTO;
+import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
 import com.venson.changliulabstandalone.utils.PageResponse;
+import com.venson.changliulabstandalone.utils.ResUtils;
 import com.venson.changliulabstandalone.utils.Result;
 import com.venson.changliulabstandalone.entity.pojo.EduResearch;
 import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.entity.dto.ResearchDTO;
-import com.venson.changliulabstandalone.entity.enums.LanguageEnum;
 import com.venson.changliulabstandalone.service.admin.EduResearchService;
 import com.venson.changliulabstandalone.service.admin.EduReviewService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,63 +29,79 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/eduservice/admin/edu-research")
+@Slf4j
+@RequiredArgsConstructor
 public class EduResearchController {
 
-    @Autowired
-    private EduResearchService service;
-    @Autowired
-    private EduReviewService reviewService;
+    private final EduResearchService service;
+    private final EduReviewService reviewService;
+
+//    @GetMapping()
+//    public ResponseEntity<PageResponse<EduResearch>> getResearchPage(PageQueryVo pageQueryVo){
+//        PageResponse<EduResearch> res =  service.getResearchPage(pageQueryVo);
+//        return ResUtils.ok(res);
+//    }
 
     @GetMapping("{page}/{limit}")
-    @PreAuthorize("hasAuthority('research.list')")
-    public Result<PageResponse<EduResearch>> getResearchPage(@PathVariable Integer page, @PathVariable Integer limit){
+    @PreAuthorize("hasAuthority('Research.READ')")
+    public ResponseEntity<PageResponse<EduResearch>> getResearchPage(@PathVariable Integer page, @PathVariable Integer limit){
         PageResponse<EduResearch> pageRes = service.getResearchPage(page, limit);
-        return Result.success(pageRes);
+        return ResUtils.ok(pageRes);
+    }
+    @GetMapping()
+    @PreAuthorize("hasAuthority('Research.READ')")
+    public ResponseEntity<PageResponse<EduResearch>> getPage(PageQueryVo queryVo){
+        PageResponse<EduResearch> pageRes = service.getResearchPage(queryVo);
+        return ResUtils.ok(pageRes);
     }
     @GetMapping("{id}")
-    @PreAuthorize("hasAuthority('research.edit')")
-    public Result<AdminResearchDTO> getResearch(@PathVariable Long id){
+    @PreAuthorize("hasAuthority('Research.READ')")
+    public ResponseEntity<AdminResearchDTO> getResearch(@PathVariable Long id){
         AdminResearchDTO researchDTO = service.getResearchById(id);
-        return Result.optional(researchDTO);
+        return ResUtils.optional(researchDTO);
     }
     @GetMapping("preview/{id}")
-    public Result<ResearchDTO> getResearchPreviewById(@PathVariable Long id){
+    @PreAuthorize("hasAuthority('Research.READ')")
+    public ResponseEntity<ResearchDTO> getResearchPreviewById(@PathVariable Long id){
         ResearchDTO preview = service.getResearchPreviewById(id);
-        return Result.success(preview);
+        return ResUtils.optional(preview);
     }
     @PostMapping()
-    @PreAuthorize("hasAuthority('research.add')")
-    public Result<Long> addResearch(@Valid @RequestBody AdminResearchDTO research){
+    @PreAuthorize("hasAuthority('Research.CREATE')")
+    public ResponseEntity<Long> addResearch(@Valid @RequestBody AdminResearchDTO research){
         Long id = service.addResearch(research);
-        return Result.success(id);
+        return ResUtils.created(id);
     }
     @PutMapping("{id}")
-    @PreAuthorize("hasAuthority('research.edit')")
-    public Result<String> updateResearch(@PathVariable Long id,@Valid @RequestBody AdminResearchDTO research){
+    @PreAuthorize("hasAuthority('Research.EDIT')")
+    public ResponseEntity<String> updateResearch(@PathVariable Long id,@Valid @RequestBody AdminResearchDTO research){
         service.updateResearch(id,research);
-        return Result.success();
+        return ResUtils.ok();
     }
     @DeleteMapping("{id}")
-    public Result<String> removeResearch(@PathVariable Long id){
+    @PreAuthorize("hasAuthority('Research.REMOVE')")
+    public ResponseEntity<String> removeResearch(@PathVariable Long id){
         service.removeResearchById(id);
-        return Result.success();
+        return ResUtils.ok();
     }
 
     @GetMapping("review/{id}")
-    @PreAuthorize("hasAnyAuthority('research.review', 'research.review.request','research.review.pass','research.review.reject')")
-    public Result<List<EduReview>> getReview(@PathVariable Long id){
+    @PreAuthorize("hasAuthority('Research.REVIEW_READ')")
+    public ResponseEntity<List<EduReview>> getReview(@PathVariable Long id){
         List<EduReview> reviewList = reviewService.getReviewByResearchId(id);
-        return Result.success(reviewList);
+        return ResUtils.optional(reviewList);
     }
-    @GetMapping("review/{current}/{size}")
-    public Result<PageResponse<EduResearch>> getResearchReviewPage(@PathVariable Integer current, @PathVariable Integer size){
-        PageResponse<EduResearch> page =service.getResearchReviewPage(current, size);
-        return Result.success(page);
+    @GetMapping("review")
+    @PreAuthorize("hasAuthority('Research.REVIEW_READ')")
+    public ResponseEntity<PageResponse<EduResearch>> getResearchReviewPage(PageQueryVo vo){
+        PageResponse<EduResearch> page =service.getResearchReviewPage(vo);
+        return ResUtils.optional(page);
     }
     @GetMapping(value = "enable/{id}",params = {"lang"})
-    public Result<String> switchEnableById(@PathVariable Long id, @RequestParam LanguageEnum lang){
-        service.switchEnableById(id, lang);
-        return Result.success();
+    @PreAuthorize("hasAuthority('Research.ENABLE')")
+    public ResponseEntity<String> switchEnableById(@PathVariable Long id){
+        service.switchEnableById(id);
+        return ResUtils.ok();
     }
 
 }

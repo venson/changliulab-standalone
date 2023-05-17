@@ -1,10 +1,16 @@
 package com.venson.changliulabstandalone.service.admin;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
+import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.entity.vo.admin.AdminMethodologyVo;
+import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.entity.pojo.EduMethodology;
 import com.venson.changliulabstandalone.entity.dto.MethodologyDTO;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * <p>
@@ -32,4 +38,10 @@ public interface EduMethodologyService extends IService<EduMethodology> {
     void switchEnableById(Long id);
 
     void switchPublicById(Long id);
+
+    PageResponse<EduMethodology> getMethodologyPage(PageQueryVo vo);
+
+    void removeMethodologyById(Long id);
+
+    Collection<? extends ReviewBasicDTO> getInfoByReviews(List<EduReview> orDefault);
 }

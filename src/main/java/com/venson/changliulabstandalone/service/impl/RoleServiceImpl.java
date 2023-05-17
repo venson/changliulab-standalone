@@ -1,17 +1,23 @@
 package com.venson.changliulabstandalone.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulabstandalone.constant.AdminCacheConst;
+import com.venson.changliulabstandalone.entity.dto.AdminRoleDTO;
 import com.venson.changliulabstandalone.entity.pojo.AdminRole;
 import com.venson.changliulabstandalone.entity.pojo.AdminRolePermission;
 import com.venson.changliulabstandalone.entity.pojo.AdminUserRole;
-import com.venson.changliulabstandalone.entity.dto.AdminRolePermissionDTO;
+import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
 import com.venson.changliulabstandalone.mapper.AdminRoleMapper;
 import com.venson.changliulabstandalone.service.admin.AdminPermissionService;
 import com.venson.changliulabstandalone.service.admin.AdminRolePermissionService;
 import com.venson.changliulabstandalone.service.admin.AdminRoleService;
 import com.venson.changliulabstandalone.service.admin.AdminUserRoleService;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.venson.changliulabstandalone.utils.PageResponse;
+import com.venson.changliulabstandalone.utils.PageUtil;
 import io.jsonwebtoken.lang.Assert;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -99,18 +108,19 @@ public class RoleServiceImpl extends ServiceImpl<AdminRoleMapper, AdminRole> imp
 
     @Override
 //    @CacheEvict(value = {AdminCacheConst.USER_MENU_NAME, AdminCacheConst.USER_MENU_NAME}, allEntries = true)
-    public void addRoleWithPermissions(AdminRolePermissionDTO rolePermissionDTO) {
+    public Long addRoleWithPermissions(AdminRoleDTO rolePermissionDTO) {
         AdminRole role = new AdminRole();
         BeanUtils.copyProperties(rolePermissionDTO,role);
         baseMapper.insert(role);
         permissionService.saveRolePermissionRelationShipLab(role.getId(),
                 rolePermissionDTO.getPermissionIds());
+        return role.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(value = {AdminCacheConst.USER_MENU_NAME, AdminCacheConst.USER_MENU_NAME}, allEntries = true)
-    public void updateRoleWithPermissions(AdminRolePermissionDTO rolePermissionDTO) {
+    public void updateRoleWithPermissions(AdminRoleDTO rolePermissionDTO) {
         AdminRole role = baseMapper.selectById(rolePermissionDTO.getId());
         Assert.notNull(role);
         // update role information
@@ -119,9 +129,8 @@ public class RoleServiceImpl extends ServiceImpl<AdminRoleMapper, AdminRole> imp
         role.setRemark(role.getRemark());
         baseMapper.updateById(role);
         // update role permission relation
-        if(rolePermissionDTO.getPermissionChanged()){
             List<AdminRolePermission> addList= new ArrayList<>();
-            HashSet<Long> permissionIdSet = new HashSet<>(List.of(rolePermissionDTO.getPermissionIds()));
+            HashSet<Long> permissionIdSet = new HashSet<>(rolePermissionDTO.getPermissionIds());
             Map<Long, AdminRolePermission> permissionIdRoleMap = permissionService.getPermissionIdsByRoleId(role.getId());
             for (Long permissionId : permissionIdSet) {
                 if (permissionIdRoleMap.containsKey(permissionId)) {
@@ -144,7 +153,6 @@ public class RoleServiceImpl extends ServiceImpl<AdminRoleMapper, AdminRole> imp
             if(removeList.size()>0){
                 rolePermissionService.removeBatchByIds(removeList);
             }
-        }
 
     }
 
@@ -152,5 +160,24 @@ public class RoleServiceImpl extends ServiceImpl<AdminRoleMapper, AdminRole> imp
     @CacheEvict(value = {AdminCacheConst.USER_MENU_NAME, AdminCacheConst.USER_MENU_NAME}, allEntries = true)
     public void removeRoleById(Long id) {
         baseMapper.deleteById(id);
+    }
+
+    @Override
+    public PageResponse<AdminRole> getPage(PageQueryVo vo) {
+        Page<AdminRole> page = new Page<>(vo.page(), vo.perPage());
+        return PageUtil.toBean(baseMapper.selectPage(page,null));
+    }
+
+    @Override
+    public AdminRoleDTO getRoleById(Long id) {
+        AdminRole adminRole = baseMapper.selectById(id);
+        LambdaQueryWrapper<AdminRolePermission> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(AdminRolePermission::getRoleId, id).select(AdminRolePermission::getPermissionId);
+        List<AdminRolePermission> list = rolePermissionService.list(wrapper);
+        List<Long> permissionIds = list.stream().map(AdminRolePermission::getPermissionId).toList();
+        AdminRoleDTO dto = new AdminRoleDTO();
+        BeanUtils.copyProperties(adminRole,dto);
+        dto.setPermissionIds(permissionIds);
+        return dto;
     }
 }

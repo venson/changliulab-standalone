@@ -3,6 +3,7 @@ package com.venson.changliulabstandalone.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.venson.changliulabstandalone.constant.FrontCacheConst;
+import com.venson.changliulabstandalone.entity.vo.admin.ListQueryParams;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.utils.PageUtil;
 import com.venson.changliulabstandalone.entity.pojo.EduScholar;
@@ -92,6 +93,22 @@ public class EduScholarServiceImp extends ServiceImpl<EduScholarMapper, EduSchol
         memberScholarService.addMemberScholarByMemberIdList(id,scholar.getMemberList());
 
         return null;
+    }
+
+    @Override
+    public PageResponse<EduScholar> getPageScholar(ListQueryParams queryParams) {
+
+        Page<EduScholar> pageScholar = new Page<>(queryParams.page(), queryParams.perPage());
+        LambdaQueryWrapper<EduScholar> wrapper = new LambdaQueryWrapper<>();
+        List<HashMap<String, String>> filter = queryParams.getFilter();
+        String title = filter.get(0).getOrDefault("title", "");
+//            wrapper.eq(StringUtils.hasText(filterVo.getYear()),EduScholar::getYear, filterVo.getYear());
+//            wrapper.like(StringUtils.hasText(filterVo.getAuthors()),EduScholar::getAuthors, filterVo.getAuthors());
+            wrapper.like(StringUtils.hasText(title),EduScholar::getTitle, title);
+            wrapper.select(EduScholar::getId, EduScholar::getTitle, EduScholar::getYear, EduScholar::getTotalCitations);
+        baseMapper.selectPage(pageScholar,wrapper);
+
+        return PageUtil.toBean(pageScholar);
     }
 
 }

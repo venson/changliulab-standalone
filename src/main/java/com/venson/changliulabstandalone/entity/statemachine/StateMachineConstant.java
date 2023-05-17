@@ -9,4 +9,5 @@ public class StateMachineConstant {
     public static final String RESEARCH_STATE_MACHINE_ID= "researchStateMachine";
     public static final String METHODOLOGY_STATE_MACHINE_ID= "methodologyStateMachine";
     public static final String ACTIVITY_STATE_MACHINE_ID= "activityStateMachine";
+    public static final String REPORT_STATE_MACHINE_ID= "reportStateMachine";
 }

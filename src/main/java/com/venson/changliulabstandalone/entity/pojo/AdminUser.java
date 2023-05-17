@@ -39,6 +39,8 @@ public class AdminUser implements Serializable {
 
     private String avatar;
 
+    private Boolean enable;
+
 
     @TableLogic
     private Boolean isDeleted;

@@ -4,7 +4,9 @@ import com.venson.changliulabstandalone.entity.pojo.AdminUser;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.venson.changliulabstandalone.entity.dto.AclUserDTO;
 import com.venson.changliulabstandalone.entity.vo.UserPersonalVO;
+import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
 import com.venson.changliulabstandalone.entity.vo.front.FrontUserDTO;
+import com.venson.changliulabstandalone.utils.PageResponse;
 
 /**
  * <p>
@@ -34,4 +36,6 @@ public interface AdminUserService extends IService<AdminUser> {
     void removeUserById(Long id);
 
     FrontUserDTO getAdminUserForFrontById(Long id);
+
+    PageResponse<AdminUser> getPage(PageQueryVo vo);
 }

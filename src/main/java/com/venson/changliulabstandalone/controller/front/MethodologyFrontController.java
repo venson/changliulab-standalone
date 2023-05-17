@@ -36,7 +36,7 @@ public class MethodologyFrontController {
                 isMember =  UserType.MEMBER.equals(userContext.getType());
             }
         }catch (Exception ignored){}
-        Assert.isTrue(methodology.getIsPublic() && isMember, ExcUtils.unAuthorized());
+        Assert.isTrue(methodology.getIsPublic() || isMember, ExcUtils.unAuthorized());
         return Result.success(methodology);
 
     }

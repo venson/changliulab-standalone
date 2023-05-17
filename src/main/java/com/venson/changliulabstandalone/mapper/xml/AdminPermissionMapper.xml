@@ -6,11 +6,11 @@
         <result property="pid" column="pid"/>
         <result property="name" column="name"/>
         <result property="type" column="type"/>
-        <result property="permissionValue" column="permission_value"/>
+        <result property="slug" column="permission_value"/>
         <result property="path" column="path"/>
         <result property="component" column="component"/>
         <result property="icon" column="icon"/>
-        <result property="status" column="status"/>
+        <result property="enable" column="status"/>
         <result property="isDeleted" column="is_deleted"/>
         <result property="gmtCreate" column="gmt_create"/>
         <result property="gmtModified" column="gmt_modified"/>
@@ -34,21 +34,21 @@
 
     <select id="selectPermissionValueByUserId" resultType="String" >
     	select
-        p.permission_value
+        p.slug
         from acl_user_role ur
         inner join acl_role_permission rp on rp.role_id = ur.role_id
         inner join acl_permission p on p.id = rp.permission_id
         where ur.user_id = #{userId}
-        and p.type = 2
+        and p.enable = true
         and ur.is_deleted = 0
         and p.is_deleted = 0
     </select>
 
     <select id="selectAllPermissionValue" resultType="String">
         select
-        permission_value
+        slug
         from acl_permission
-        where type = 2
+        where enable= true
         and is_deleted = 0
     </select>
 </mapper>

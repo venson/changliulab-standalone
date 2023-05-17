@@ -23,6 +23,6 @@ public class AdminResearchDTO {
 
     private LanguageEnum language;
     private ReviewStatus review;
-//    private List<Long> memberIds;
+    private List<Long> memberIds;
     private List<BasicMemberVo> members;
 }

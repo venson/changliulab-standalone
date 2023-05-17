@@ -1,4 +1,4 @@
-package com.venson.changliulabstandalone.filter;
+package com.venson.changliulabstandalone.config.security;
 
 import com.venson.changliulabstandalone.adapter.AuthPathAdapter;
 import com.venson.changliulabstandalone.entity.UserContextInfoBO;
@@ -12,9 +12,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.HttpResponseException;
 import org.springframework.core.Ordered;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.PathContainer;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.pattern.PathPattern;
 
 import java.io.IOException;
@@ -46,29 +49,28 @@ public class AuthTokenFilter extends OncePerRequestFilter implements Ordered {
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain chain) throws ServletException, IOException {
-
+        boolean isAuthorized = false;
         String requestURI = req.getRequestURI();
         if(HttpMethod.OPTIONS.matches(req.getMethod())){
             chain.doFilter(req,res);
             return;
         }
         String token = getBearerToken(req);
-        List<String> pathWhiteList = pathAdapter.pathWhiteList();
-        List<PathPattern> patternWhiteList = pathAdapter.patternWhiteList();
-        List<PathPattern> patternDocList = pathAdapter.patternDocList();
         UsernamePasswordAuthenticationToken authentication;
 
         //1.request math white list
-        if (checkPathWhiteList(requestURI, pathWhiteList)) {
+        // login url
+//        if (checkPathWhiteList(requestURI, pathWhiteList)) {
+//            chain.doFilter(req, res);
+//            return;
+//        }
+        if (pathAdapter.checkWhiteList(requestURI)) {
             chain.doFilter(req, res);
             return;
         }
-        if (checkPathPatternWhiteList(requestURI, patternDocList)) {
-            chain.doFilter(req, res);
-            return;
-        }
+        //        /*/front/**
         // 2. request match pattern
-        if (checkPathPatternWhiteList(requestURI, patternWhiteList)) {
+        if (pathAdapter.checkPatternList(requestURI)) {
             if (token != null && !"undefined".equals(token)) {
                 try {
                     authentication = getAuthentication(token);
@@ -88,15 +90,18 @@ public class AuthTokenFilter extends OncePerRequestFilter implements Ordered {
         try {
             authentication = getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            isAuthorized = true;
             chain.doFilter(req, res);
-            return;
         } catch (Exception e) {
-//            e.printStackTrace();
-            log.info(e.toString());
-            log.info("auth Failed:");
-            log.info(req.getRemoteAddr());
-            log.info(req.getRequestURI());
-            ResponseUtil.out(res, Result.tokenExpire());
+            e.printStackTrace();
+//            log.info(e.toString());
+            log.info("auth Failed for admin request ");
+//            throw new CustomizedException(2001,"234234");
+            handleUnauthorized(res, isAuthorized);
+//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"please login");
+            return;
+        }finally {
+            SecurityContextHolder.clearContext();
         }
 
     }
@@ -121,9 +126,14 @@ public class AuthTokenFilter extends OncePerRequestFilter implements Ordered {
      */
     private String getBearerToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
-        if (token != null && token.contains("Bearer")) {
-            return token.split(" ")[1];
+        if(token==null){
+            token = request.getHeader("token");
         }
+        if (token != null && token.contains("Bearer")) {
+//            return token.split(" ")[1];
+            return token.substring(7);
+        }
+        log.debug(token);
         return null;
 
     }
@@ -143,40 +153,18 @@ public class AuthTokenFilter extends OncePerRequestFilter implements Ordered {
             }
         }
         log.info("redis user auth down");
-        throw new CustomizedException(20001, "Token error");
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"please login");
     }
+    private void handleUnauthorized(HttpServletResponse response, boolean isAuthorized) throws IOException {
+        if(!isAuthorized){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-    /**
-     * check whether given path match whiteList pattern
-     * @param path the path get from request
-     * @param pathPatternWhiteList List<PathPattern> pathPattern list
-     * @return return true if path match one of pattern in pathPatternWhiteList
-     */
-    private boolean checkPathPatternWhiteList(String path, List<PathPattern> pathPatternWhiteList) {
-        for (PathPattern pattern : pathPatternWhiteList) {
-            if (pattern.matches(PathContainer.parsePath(path))) {
-                return true;
-            }
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            response.getWriter().println("401 Please Login");
         }
-        return false;
     }
-
-    /**
-     *
-     * check whether the given path equals whiteList path
-     * @param path the path get from request
-     * @param pathWhiteList List<String> path whitelist List
-     * @return return true if path equals one of the path in pathWhiteList
-     */
-    private boolean checkPathWhiteList(String path, List<String> pathWhiteList) {
-        for (String white : pathWhiteList) {
-            if (white.equals(path)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public int getOrder() {
         return Ordered.HIGHEST_PRECEDENCE;

@@ -23,10 +23,9 @@ import com.venson.changliulabstandalone.mapper.EduActivityPublishedMdMapper;
 import com.venson.changliulabstandalone.service.StateMachineService;
 import com.venson.changliulabstandalone.utils.CacheUtils;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,23 +38,18 @@ import org.springframework.util.ObjectUtils;
 
 @Configuration
 @Slf4j
-public class ActivityStateMachineConfig {
+@RequiredArgsConstructor
+public class ActivityStateMachineImpl {
 
-    @Autowired
-    private TransactionTemplate transactionTemplate;
-    @Autowired
-    private StateMachineService stateMachineService;
+    private final TransactionTemplate transactionTemplate;
+    private final StateMachineService stateMachineService;
 
-    @Autowired
-    CacheManager cacheManager;
-    @Autowired
-    private EduActivityMapper activityMapper;
-    @Autowired
-    private EduActivityMarkdownMapper activityMarkdownMapper;
-    @Autowired
-    private EduActivityPublishedMapper activityPublishedMapper;
-    @Autowired
-    private EduActivityPublishedMdMapper activityPublishedMdMapper;
+    private final CacheManager cacheManager;
+    private final EduActivityMapper activityMapper;
+    private final EduActivityMarkdownMapper activityMarkdownMapper;
+    private final EduActivityPublishedMapper activityPublishedMapper;
+    private final EduActivityPublishedMdMapper activityPublishedMdMapper;
+
 
     @Bean
     public StateMachine<ReviewStatus, ReviewAction, ReviewApplyVo> activityStateMachine() {
@@ -82,7 +76,7 @@ public class ActivityStateMachineConfig {
 
         return builder.build(StateMachineConstant.ACTIVITY_STATE_MACHINE_ID);
     }
-    @PreAuthorize("hasAuthority('activity.review.apply')")
+    @PreAuthorize("hasAuthority('Activity.review.apply')")
     private Condition<ReviewApplyVo> requestNoneActivityCon() {
         return (ctx) -> {
             EduActivity activity = activityMapper.selectById(ctx.getId());
@@ -106,7 +100,7 @@ public class ActivityStateMachineConfig {
     }
 
 
-    @PreAuthorize("hasAuthority('activity.review.reject')")
+    @PreAuthorize("hasAuthority('Activity.review.reject')")
     private Condition<ReviewApplyVo> requestRejectActivityCon() {
         return (ctx) -> {
             EduActivity activity = activityMapper.selectById(ctx.getId());
@@ -176,15 +170,7 @@ public class ActivityStateMachineConfig {
 
                         }
                         CacheUtils.evict(cacheManager,FrontCacheConst.ACTIVITY_NAME,activityId.toString());
-//                        Cache activityCache = cacheManager.getCache(FrontCacheConst.ACTIVITY_NAME);
-//                        if(activityCache!=null){
-//                            activityCache.evict(activityId);
-//                        }
                         CacheUtils.evict(cacheManager,FrontCacheConst.ACTIVITY_PAGE_NAME);
-//                        Cache activityPage = cacheManager.getCache(FrontCacheConst.ACTIVITY_PAGE_NAME);
-//                        if(activityCache!=null){
-//                            activityCache.clear();
-//                        }
 
                     }
                 }

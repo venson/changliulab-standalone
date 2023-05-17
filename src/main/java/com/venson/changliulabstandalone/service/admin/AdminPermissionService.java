@@ -1,11 +1,12 @@
 package com.venson.changliulabstandalone.service.admin;
 
-import com.alibaba.fastjson.JSONObject;
+import com.venson.changliulabstandalone.entity.dto.AdminPermissionTree;
 import com.venson.changliulabstandalone.entity.pojo.AdminPermission;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.venson.changliulabstandalone.entity.pojo.AdminRolePermission;
 import com.venson.changliulabstandalone.entity.dto.AdminPermissionDTO;
-import com.venson.changliulabstandalone.entity.dto.MenuDTO;
+import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
+import com.venson.changliulabstandalone.utils.PageResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -27,18 +28,24 @@ public interface AdminPermissionService extends IService<AdminPermission> {
 
 
     //根据用户id获取用户菜单
+
+    /**
+     * return list of slug for SecurityUser
+     * @param id user Id
+     * @return return list of slug
+     */
     List<String> selectPermissionValueByUserId(Long id);
 
-    List<JSONObject> selectPermissionByUserId(Long id);
+//    List<JSONObject> selectPermissionByUserId(Long id);
 
     //获取全部菜单
-    List<AdminPermissionDTO> doGetAllPermissionTree();
+//    List<AdminPermissionDTO> doGetAllPermissionTree();
 
     //递归删除菜单
-    void doRemovePermissionById(Long id);
+    AdminPermission doRemovePermissionById(Long id);
 
     //给角色分配权限
-    void saveRolePermissionRelationShipLab(Long roleId,Long[] permissionId);
+    void saveRolePermissionRelationShipLab(Long roleId, List<Long> permissionId);
 
     Map<Long,AdminRolePermission> getPermissionIdsByRoleId(Long id);
 
@@ -46,15 +53,19 @@ public interface AdminPermissionService extends IService<AdminPermission> {
 
     void doUpdatePermission(Long id, AdminPermission adminPermission);
 
-    List<MenuDTO> doGetMenus(Long id);
+//    List<MenuDTO> doGetMenus(Long id);
 
     List<Long> doGetPermissionsIdsByRoleId(Long roleId);
 
-    List<Long> getIgnorePermissionIds();
+//    List<Long> getIgnorePermissionIds();
 
-    void addPermission(AdminPermissionDTO permission);
+    Long addPermission(AdminPermissionDTO permission);
 
-    List<Long> getMenuPermissionIdsByUserId(Long id);
+//    List<PermissionDTO> getPermissionsByUserId(Long id);
 
-    List<AdminPermission> getAllPermissions(boolean allPermission);
+//    List<AdminPermission> getAllPermissions(boolean allPermission);
+
+    PageResponse<AdminPermission> getPage(PageQueryVo vo);
+
+    List<AdminPermissionTree> doGetAllPermission();
 }

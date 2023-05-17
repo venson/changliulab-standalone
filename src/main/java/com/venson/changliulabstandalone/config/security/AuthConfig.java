@@ -1,9 +1,9 @@
 package com.venson.changliulabstandalone.config.security;
 
 import com.venson.changliulabstandalone.adapter.AuthPathAdapter;
-import com.venson.changliulabstandalone.filter.AuthTokenFilter;
 import com.venson.changliulabstandalone.service.TokenManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -25,15 +26,15 @@ import org.springframework.web.util.pattern.PathPatternParser;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
+@Slf4j
+@RequiredArgsConstructor
 public class AuthConfig {
-    @Autowired
-    private TokenManager tokenManager;
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-    @Autowired
-    private AuthPathAdapter pathAdapter;
+    private final TokenManager tokenManager;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final AuthPathAdapter pathAdapter;
 
-
+//    @Qualifier("delegatedAuthenticationEntryPoint")
+    private final AuthenticationEntryPoint authEntryPoint;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
@@ -57,7 +58,10 @@ public class AuthConfig {
 //        http.csrf().disable().httpBasic().disable();
 
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-        .addFilterBefore(new AuthTokenFilter(tokenManager, redisTemplate, pathAdapter), UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(new AuthTokenFilter(tokenManager, redisTemplate, pathAdapter), UsernamePasswordAuthenticationFilter.class)
+//                .oauth2ResourceServer(oauth-> oauth.jwt(jwt->jwt.jwtAuthenticationConverter()))
+                .exceptionHandling()
+                .authenticationEntryPoint(authEntryPoint);
 //                .addFilterBefore(new AuthTokenFilter(tokenManager, redisTemplate, pathAdapter), BasicAuthenticationFilter.class);
         return http.build();
 

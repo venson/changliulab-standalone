@@ -1,6 +1,7 @@
 package com.venson.changliulabstandalone.service.admin;
 
 import com.venson.changliulabstandalone.entity.vo.admin.AdminMemberVo;
+import com.venson.changliulabstandalone.entity.vo.admin.ListQueryParams;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.entity.pojo.EduMember;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -32,5 +33,9 @@ public interface EduMemberService extends IService<EduMember> {
 
     MemberFrontBriefDTO getMemberFrontById(Long id);
 
-    void addMember(AdminMemberVo eduMember);
+    Long addMember(AdminMemberVo eduMember);
+
+    PageResponse<EduMember> getMemberPage(ListQueryParams pageVo);
+
+    EduMember getMemberById(Long id);
 }

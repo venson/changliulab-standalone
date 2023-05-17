@@ -19,7 +19,6 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -144,7 +143,7 @@ public class FrontUserServiceImpl extends ServiceImpl<FrontUserMapper, FrontUser
     }
 
     @Override
-    @Cacheable(value = FrontCacheConst.USE_NAME,key =FrontCacheConst.USE_FRONT_KEY +"+#userId")
+    @Cacheable(value = FrontCacheConst.USER_NAME,key =FrontCacheConst.USER_FRONT_KEY +"+#userId")
     public FrontUserDTO getFrontUserById(Long userId) {
         LambdaQueryWrapper<FrontUser> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(FrontUser::getId, userId)

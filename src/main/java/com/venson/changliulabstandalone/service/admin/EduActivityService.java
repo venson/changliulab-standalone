@@ -1,10 +1,17 @@
 package com.venson.changliulabstandalone.service.admin;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
+import com.venson.changliulabstandalone.entity.pojo.EduReview;
+import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.entity.pojo.EduActivity;
 import com.venson.changliulabstandalone.entity.dto.ActivityAdminDTO;
 import com.venson.changliulabstandalone.entity.dto.ActivityPreviewDTO;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -34,4 +41,10 @@ public interface EduActivityService extends IService<EduActivity> {
     ActivityPreviewDTO getPreviewByActivityId(long id);
 
     Long addActivity(ActivityAdminDTO activityAdminDTO);
+
+    PageResponse<EduActivity> getPageActivityList(PageQueryVo vo);
+
+    Map<Long, String> getIdTitleMap(List<Long> refIds);
+
+    List<ReviewBasicDTO> getInfoByReviews(List<EduReview> orDefault);
 }

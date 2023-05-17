@@ -27,7 +27,7 @@ public class HomeFrontServiceImpl implements HomeFrontService {
     @Autowired
     private MemberFrontService memberFrontService;
     @Override
-    @Cacheable(value = FrontCacheConst.HOME_NAME,key = FrontCacheConst.HOME_NAME)
+    @Cacheable(value = FrontCacheConst.HOME_NAME,key = FrontCacheConst.HOME_HOME_KEY)
     public IndexFrontDTO getHomePage() {
 
         List<CourseFrontBriefDTO> courseList = courseFrontService.getFrontIndexCourse();

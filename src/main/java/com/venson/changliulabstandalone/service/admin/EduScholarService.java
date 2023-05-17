@@ -1,5 +1,6 @@
 package com.venson.changliulabstandalone.service.admin;
 
+import com.venson.changliulabstandalone.entity.vo.admin.ListQueryParams;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.entity.pojo.EduScholar;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -22,4 +23,6 @@ public interface EduScholarService extends IService<EduScholar> {
     void updateScholar(ScholarAdminDTO scholar);
 
     Long addScholar(ScholarAdminDTO scholar);
+
+    PageResponse<EduScholar> getPageScholar(ListQueryParams queryParams);
 }

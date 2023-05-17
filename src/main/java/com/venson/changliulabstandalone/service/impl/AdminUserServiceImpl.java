@@ -2,6 +2,7 @@ package com.venson.changliulabstandalone.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.venson.changliulabstandalone.constant.AdminCacheConst;
 import com.venson.changliulabstandalone.constant.FrontCacheConst;
 import com.venson.changliulabstandalone.entity.pojo.AdminUser;
@@ -9,6 +10,7 @@ import com.venson.changliulabstandalone.entity.pojo.AdminUserRole;
 import com.venson.changliulabstandalone.entity.dto.AclUserDTO;
 import com.venson.changliulabstandalone.entity.vo.ResetPasswordVo;
 import com.venson.changliulabstandalone.entity.vo.UserPersonalVO;
+import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
 import com.venson.changliulabstandalone.entity.vo.front.FrontUserDTO;
 import com.venson.changliulabstandalone.exception.CustomizedException;
 import com.venson.changliulabstandalone.mapper.AdminUserMapper;
@@ -16,6 +18,8 @@ import com.venson.changliulabstandalone.service.admin.AdminUserRoleService;
 import com.venson.changliulabstandalone.service.admin.AdminUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulabstandalone.service.MsmService;
+import com.venson.changliulabstandalone.utils.PageResponse;
+import com.venson.changliulabstandalone.utils.PageUtil;
 import com.venson.changliulabstandalone.utils.RandomString;
 import com.venson.changliulabstandalone.entity.UserContextInfoBO;
 import com.venson.changliulabstandalone.utils.ContextUtils;
@@ -100,7 +104,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
     }
 
     @Override
-    @CacheEvict(value = FrontCacheConst.USE_NAME,key = FrontCacheConst.USE_ADMIN_KEY + "+#userId")
+    @CacheEvict(value = FrontCacheConst.USER_NAME,key = FrontCacheConst.USER_ADMIN_KEY + "+#userId")
     public void updateUserPersonalInfo(UserPersonalVO userPersonalVO, Long userId) {
         AdminUser adminUser = baseMapper.selectById(userId);
         boolean match = passwordEncoder.matches(userPersonalVO.getOld(), adminUser.getPassword());
@@ -170,7 +174,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
     @Transactional
     @Caching(evict = {
             @CacheEvict(value = {AdminCacheConst.USER_MENU_NAME, AdminCacheConst.USER_MENU_NAME}, key="#id"),
-            @CacheEvict(value = FrontCacheConst.USE_NAME,key = FrontCacheConst.USE_ADMIN_KEY + "+#id")
+            @CacheEvict(value = FrontCacheConst.USER_NAME,key = FrontCacheConst.USER_ADMIN_KEY + "+#id")
 
     })
     public void removeUserById(Long id) {
@@ -182,7 +186,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
     }
 
     @Override
-    @Cacheable(value = FrontCacheConst.USE_NAME,key = FrontCacheConst.USE_ADMIN_KEY+ "+#id")
+    @Cacheable(value = FrontCacheConst.USER_NAME,key = FrontCacheConst.USER_ADMIN_KEY + "+#id")
     public FrontUserDTO getAdminUserForFrontById(Long id) {
         AdminUser adminUser = baseMapper.selectById(id);
         FrontUserDTO frontUserDTO = new FrontUserDTO();
@@ -190,5 +194,13 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
         frontUserDTO.setEmail(adminUser.getEmail()==null? adminUser.getUsername() : adminUser.getEmail());
         frontUserDTO.setId(adminUser.getId());
         return frontUserDTO;
+    }
+
+    @Override
+    public PageResponse<AdminUser> getPage(PageQueryVo vo) {
+        Page<AdminUser> page = new Page<>(vo.page(), vo.perPage());
+        LambdaQueryWrapper<AdminUser> wrapper = Wrappers.lambdaQuery();
+        wrapper.select(AdminUser::getUsername, AdminUser::getNickName, AdminUser::getEmail, AdminUser::getRandomPassword);
+        return PageUtil.toBean(baseMapper.selectPage(page,null));
     }
 }

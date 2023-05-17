@@ -3,24 +3,28 @@ package com.venson.changliulabstandalone.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulabstandalone.constant.FrontCacheConst;
-import com.venson.changliulabstandalone.entity.vo.admin.AdminMemberVo;
-import com.venson.changliulabstandalone.utils.PageResponse;
-import com.venson.changliulabstandalone.utils.PageUtil;
-import com.venson.changliulabstandalone.entity.pojo.EduMember;
 import com.venson.changliulabstandalone.entity.dto.MemberQuery;
 import com.venson.changliulabstandalone.entity.enums.MemberLevel;
 import com.venson.changliulabstandalone.entity.front.dto.MemberFrontBriefDTO;
+import com.venson.changliulabstandalone.entity.pojo.EduMember;
 import com.venson.changliulabstandalone.entity.vo.MemberVo;
+import com.venson.changliulabstandalone.entity.vo.admin.AdminMemberVo;
+import com.venson.changliulabstandalone.entity.vo.admin.ListQueryParams;
 import com.venson.changliulabstandalone.mapper.EduMemberMapper;
 import com.venson.changliulabstandalone.service.admin.EduMemberService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.venson.changliulabstandalone.utils.PageResponse;
+import com.venson.changliulabstandalone.utils.PageUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -107,9 +111,40 @@ public class EduMemberServiceImp extends ServiceImpl<EduMemberMapper, EduMember>
     }
 
     @Override
-    public void addMember(AdminMemberVo eduMember) {
+    public Long addMember(AdminMemberVo eduMember) {
         EduMember member = new EduMember();
         BeanUtils.copyProperties(eduMember,member);
         baseMapper.insert(member);
+        return member.getId();
+    }
+
+    @Override
+    public PageResponse<EduMember> getMemberPage(ListQueryParams params) {
+        List<HashMap<String, String>> filters = params.getFilter();
+        String member = filters.get(0).getOrDefault("member","all");
+
+        Page<EduMember> pageMember = new Page<>(params.page(), params.perPage());
+        LambdaQueryWrapper<EduMember> wrapper = new QueryWrapper<EduMember>().lambda();
+        if(member.equals("all")){
+            wrapper.select(EduMember::getId, EduMember::getName,EduMember::getTitle,EduMember::getLevel, EduMember::getAvatar);
+
+        }else{
+            wrapper.select(EduMember::getId, EduMember::getName);
+            wrapper.ne(EduMember::getLevel, MemberLevel.TECH);
+            wrapper.ne(EduMember::getLevel, MemberLevel.FORMER_MEMBER);
+
+        }
+        wrapper.orderByDesc(EduMember::getId);
+        baseMapper.selectPage(pageMember,wrapper);
+        return PageUtil.toBean(pageMember);
+    }
+
+    @Override
+    public EduMember getMemberById(Long id) {
+        EduMember eduMember = baseMapper.selectById(id);
+        if(eduMember == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return eduMember;
     }
 }

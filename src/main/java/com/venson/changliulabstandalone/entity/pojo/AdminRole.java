@@ -34,6 +34,7 @@ public class AdminRole implements Serializable {
     private String roleCode;
 
     private String remark;
+    private Boolean enable;
 
     @TableLogic
     private Boolean isDeleted;

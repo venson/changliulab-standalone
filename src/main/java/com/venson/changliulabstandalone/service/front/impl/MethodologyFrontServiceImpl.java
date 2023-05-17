@@ -20,7 +20,7 @@ public class MethodologyFrontServiceImpl implements MethodologyFrontService {
     @Autowired
     private EduMethodologyService methodologyService;
     @Override
-    @Cacheable(value = FrontCacheConst.METHODOLOGY_PAGE_NAME, key="#current")
+//    @Cacheable(value = FrontCacheConst.METHODOLOGY_PAGE_NAME, key="#current")
     public PageResponse<EduMethodology> getPageMethodology(Integer current, Integer size) {
         Assert.isTrue(current >0 && size>0,"Invalid Params");
         boolean isMember = false;

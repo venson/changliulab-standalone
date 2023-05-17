@@ -1,4 +1,4 @@
-package com.venson.changliulabstandalone.handler;
+package com.venson.changliulabstandalone.config.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;

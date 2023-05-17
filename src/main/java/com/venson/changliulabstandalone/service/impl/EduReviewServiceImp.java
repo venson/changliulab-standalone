@@ -2,22 +2,27 @@ package com.venson.changliulabstandalone.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
+import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
 import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.entity.pojo.EduReviewMsg;
 import com.venson.changliulabstandalone.entity.dto.ReviewDTO;
 import com.venson.changliulabstandalone.entity.enums.ReviewType;
+import com.venson.changliulabstandalone.entity.vo.admin.ListQueryParams;
 import com.venson.changliulabstandalone.mapper.EduReviewMapper;
-import com.venson.changliulabstandalone.service.admin.EduReviewMsgService;
-import com.venson.changliulabstandalone.service.admin.EduReviewService;
+import com.venson.changliulabstandalone.service.EduReportService;
+import com.venson.changliulabstandalone.service.admin.*;
+import com.venson.changliulabstandalone.utils.PageResponse;
+import com.venson.changliulabstandalone.utils.PageUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -29,11 +34,17 @@ import java.util.List;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class EduReviewServiceImp extends ServiceImpl<EduReviewMapper, EduReview> implements EduReviewService {
 
 
-    @Autowired
-    private EduReviewMsgService reviewMsgService;
+    private final EduReviewMsgService reviewMsgService;
+
+    private final EduActivityService activityService;
+    private final EduCourseService courseService;
+    private final EduMethodologyService methodologyService;
+    private final EduResearchService researchService;
+    private final EduReportService reportService;
 
     @Override
     public List<EduReview> getReviewByMethodologyId(Long id) {
@@ -78,6 +89,49 @@ public class EduReviewServiceImp extends ServiceImpl<EduReviewMapper, EduReview>
 
         return reviewDTOs;
     }
+
+    @Override
+    public PageResponse<ReviewBasicDTO> getPageReview(ListQueryParams params) {
+        List<HashMap<String, String>> filter = params.getFilter();
+        String type = filter.get(0).getOrDefault("type", "");
+        LambdaQueryWrapper<EduReview> wrapper = Wrappers.lambdaQuery();
+        Page<EduReview> page = new Page<>(params.page(),params.perPage());
+        Page<ReviewBasicDTO> pageNew = new Page<>(params.page(),params.perPage());
+        switch (type){
+            case "activity" -> wrapper.eq(EduReview::getRefType, ReviewType.ACTIVITY);
+            case "research" -> wrapper.eq(EduReview::getRefType, ReviewType.RESEARCH);
+            case "methodology" -> wrapper.eq(EduReview::getRefType, ReviewType.METHODOLOGY);
+            case "course" -> wrapper.in(EduReview::getRefType, ReviewType.COURSE, ReviewType.CHAPTER, ReviewType.SECTION);
+            case "report" -> wrapper.eq(EduReview::getRefType, ReviewType.REPORT);
+            default -> wrapper.eq(EduReview::getStatus, ReviewStatus.APPLIED);
+
+        }
+        wrapper.select(EduReview::getRefId,EduReview::getRefType, EduReview::getId,EduReview::getGmtCreate,EduReview::getStatus);
+        baseMapper.selectPage(page,wrapper);
+        BeanUtils.copyProperties(page,pageNew,"records");
+        List<ReviewBasicDTO> data = handleReviews(page.getRecords());
+        data.sort((o1, o2) -> Long.compare(o2.getId() ,o1.getId()));
+        pageNew.setRecords(data);
+
+        return PageUtil.toBean(pageNew);
+    }
+
+    private List<ReviewBasicDTO> handleReviews(List<EduReview> reviews) {
+        List<ReviewBasicDTO> dataList = new ArrayList<>();
+        Map<ReviewType, List<EduReview>> reviewTypeListMap= reviews.stream().collect(Collectors.groupingBy(EduReview::getRefType, Collectors.toList()));
+        Map<ReviewType, List<EduReview>> reviewTypeCourseMap = new HashMap<>();
+        reviewTypeListMap.computeIfPresent(ReviewType.COURSE, reviewTypeCourseMap::put);
+        reviewTypeListMap.computeIfPresent(ReviewType.CHAPTER, reviewTypeCourseMap::put);
+        reviewTypeListMap.computeIfPresent(ReviewType.SECTION, reviewTypeCourseMap::put);
+        dataList.addAll(courseService.getInfoByReviews(reviewTypeCourseMap));
+        dataList.addAll(activityService.getInfoByReviews(reviewTypeListMap.getOrDefault(ReviewType.ACTIVITY, Collections.emptyList())));
+        dataList.addAll(researchService.getInfoByReviews(reviewTypeListMap.getOrDefault(ReviewType.RESEARCH, Collections.emptyList())));
+        dataList.addAll(methodologyService.getInfoByReviews(reviewTypeListMap.getOrDefault(ReviewType.METHODOLOGY, Collections.emptyList())));
+        dataList.addAll(reportService.getInfoByReviews(reviewTypeListMap.getOrDefault(ReviewType.REPORT,Collections.emptyList())));
+
+        return dataList;
+    }
+
 
     @Override
     public List<EduReview> getReviewByResearchId(Long id) {

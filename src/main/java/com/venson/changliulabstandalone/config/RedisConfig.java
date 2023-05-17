@@ -100,7 +100,7 @@ public class RedisConfig implements CachingConfigurer {
             StringBuilder stringBuffer = new StringBuilder();
             stringBuffer.append(method.getName());
             for (Object obj : params) {
-                stringBuffer.append(":").append(obj.toString());
+                stringBuffer.append(":").append(obj==null? "null": obj.toString());
             }
             return stringBuffer.toString();
         };

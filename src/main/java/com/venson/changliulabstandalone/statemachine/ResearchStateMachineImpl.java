@@ -14,27 +14,28 @@ import com.venson.changliulabstandalone.entity.pojo.EduResearch;
 import com.venson.changliulabstandalone.entity.statemachine.StateMachineConstant;
 import com.venson.changliulabstandalone.mapper.EduResearchMapper;
 import com.venson.changliulabstandalone.service.StateMachineService;
+import com.venson.changliulabstandalone.utils.Assert;
+import com.venson.changliulabstandalone.utils.StateMachineConst;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.ObjectUtils;
 
 
 @Configuration
-public class ResearchStateMachineConfig {
+@RequiredArgsConstructor
+public class ResearchStateMachineImpl {
 
-    @Autowired
-    private TransactionTemplate transactionTemplate;
-    @Autowired
-    private StateMachineService stateMachineService;
+    private final TransactionTemplate transactionTemplate;
+    private final StateMachineService stateMachineService;
 
-    @Autowired
-    private EduResearchMapper researchMapper;
+    private final EduResearchMapper researchMapper;
+
+
 
     @Bean
     public StateMachine<ReviewStatus, ReviewAction, ReviewApplyVo> researchStateMachine() {
@@ -65,7 +66,9 @@ public class ResearchStateMachineConfig {
     private Condition<ReviewApplyVo> requestNoneResearchCon() {
         return (ctx) -> {
             EduResearch research = researchMapper.selectById(ctx.getId());
-            return !ObjectUtils.isEmpty(research) && research.getReview() == ctx.getFrom();
+            Assert.notNull(research,"Invalid research");
+            Assert.isTrue(StateMachineConst.NONE.contains(ctx.getFrom()),"Invalid research");
+            return true;
         };
     }
 
@@ -89,7 +92,9 @@ public class ResearchStateMachineConfig {
     private Condition<ReviewApplyVo> requestRejectResearchCon() {
         return (ctx) -> {
             EduResearch research = researchMapper.selectById(ctx.getId());
-            return !ObjectUtils.isEmpty(research) && research.getReview() == ctx.getFrom();
+            Assert.notNull(research,"Invalid research");
+            Assert.isTrue(ReviewStatus.APPLIED.equals(ctx.getFrom()),"Invalid research");
+            return true;
         };
     }
 
@@ -112,7 +117,8 @@ public class ResearchStateMachineConfig {
     private Condition<ReviewApplyVo> reviewResearchCon() {
         return (ctx) -> {
             EduResearch research = researchMapper.selectById(ctx.getId());
-            return !ObjectUtils.isEmpty(research) && research.getReview() == ctx.getFrom();
+            Assert.notNull(research,"Invalid Research");
+            return research.getReview() == ctx.getFrom();
         };
     }
 
@@ -126,6 +132,7 @@ public class ResearchStateMachineConfig {
                     Long researchId =ctx.getId();
                     // remove research if marked isRemoveAfterReview
                     EduResearch research = researchMapper.selectById(researchId);
+                    Assert.notNull(research,"Invalid Research");
                     if (research.getIsRemoveAfterReview()) {
                         researchMapper.deleteById(researchId);
                     } else {

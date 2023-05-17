@@ -1,11 +1,13 @@
 package com.venson.changliulabstandalone.controller.admin;
 
+import com.venson.changliulabstandalone.utils.ResUtils;
 import com.venson.changliulabstandalone.utils.Result;
 import com.venson.changliulabstandalone.entity.dto.SectionContentDTO;
 import com.venson.changliulabstandalone.entity.dto.SectionPreviewDTO;
 import com.venson.changliulabstandalone.service.admin.EduSectionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -37,37 +39,37 @@ public class EduSectionController {
      */
     @GetMapping("{sectionId}")
     @PreAuthorize("hasAnyAuthority('course.edit.content', 'course.edit.preview')")
-    public Result<SectionContentDTO> getSectionById(@PathVariable Long sectionId){
+    public ResponseEntity<SectionContentDTO> getSectionById(@PathVariable Long sectionId){
         SectionContentDTO section = sectionService.getSectionById(sectionId);
-        return Result.success(section);
+        return ResUtils.ok(section);
     }
     @Transactional
     @PostMapping("")
     @PreAuthorize("hasAuthority('course.edit.content')")
-    public Result<Long> addSectionById(@RequestBody SectionContentDTO section){
+    public ResponseEntity<Long> addSectionById(@RequestBody SectionContentDTO section){
         Long id = sectionService.addSection(section);
         log.info(String.valueOf(id));
-        return Result.success(id);
+        return ResUtils.ok(id);
     }
 
     @GetMapping("preview/{id}")
     @PreAuthorize("hasAuthority('course.edit.preview')")
-    public Result<SectionPreviewDTO> getSectionPreviewBySectionId(@PathVariable Long id){
+    public ResponseEntity<SectionPreviewDTO> getSectionPreviewBySectionId(@PathVariable Long id){
         SectionPreviewDTO previewDTO = sectionService.getSectionPreviewBySectionId(id);
-        return Result.success(previewDTO);
+        return ResUtils.ok(previewDTO);
 
     }
     @PutMapping("{sectionId}")
     @PreAuthorize("hasAuthority('course.edit.content')")
-    public Result<String> updateSectionById(@PathVariable Long sectionId, @RequestBody SectionContentDTO sectionContentDTO){
+    public ResponseEntity<String> updateSectionById(@PathVariable Long sectionId, @RequestBody SectionContentDTO sectionContentDTO){
         sectionService.updateSectionById(sectionId, sectionContentDTO);
-        return Result.success();
+        return ResUtils.ok();
     }
 
     @DeleteMapping("{sectionId}")
-    public Result<String> deleteSectionById(@PathVariable Long sectionId ){
+    public ResponseEntity<String> deleteSectionById(@PathVariable Long sectionId ){
         sectionService.removeMarkSectionById(sectionId);
-        return Result.success();
+        return ResUtils.ok();
 
     }
 

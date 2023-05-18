@@ -11,14 +11,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class ReviewDTO implements Serializable {
+public class ReviewDTO<T> implements Serializable {
     @Serial
     private static final long serialVersionUID = 7936434L;
     private Long id;
     private ReviewStatus status;
     private ReviewType refType;
     private Long refId;
+    private T reviewed;
+    private T applied;
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;
     private List<EduReviewMsg > messages;
+
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
@@ -35,7 +36,7 @@ public class EduActivity implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime gmtModified;
 
-    private String activityDate;
+    private LocalDate activityDate;
 
     private Long authorMemberId;
 

@@ -1,15 +1,12 @@
 package com.venson.changliulabstandalone.service.admin;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
+import com.venson.changliulabstandalone.entity.dto.*;
 import com.venson.changliulabstandalone.entity.enums.ReviewType;
 import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.entity.vo.admin.ListQueryParams;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.entity.pojo.EduCourse;
-import com.venson.changliulabstandalone.entity.dto.CourseInfoDTO;
-import com.venson.changliulabstandalone.entity.dto.CoursePageDTO;
-import com.venson.changliulabstandalone.entity.dto.CoursePreviewVo;
 
 import java.util.Collection;
 import java.util.List;
@@ -47,4 +44,6 @@ public interface EduCourseService extends IService<EduCourse> {
     PageResponse<EduCourse> getPageCoursePublishVo(ListQueryParams vo);
 
     Collection<? extends ReviewBasicDTO> getInfoByReviews(Map<ReviewType, List<EduReview>> courseMap);
+
+    <T> ReviewDTO<T> getReviewById(Long id, ReviewType refType);
 }

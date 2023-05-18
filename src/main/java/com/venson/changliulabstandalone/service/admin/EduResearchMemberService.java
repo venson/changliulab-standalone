@@ -1,5 +1,6 @@
 package com.venson.changliulabstandalone.service.admin;
 
+import com.venson.changliulabstandalone.entity.pojo.EduMember;
 import com.venson.changliulabstandalone.entity.pojo.EduResearchMember;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.venson.changliulabstandalone.entity.vo.BasicMemberVo;
@@ -21,4 +22,6 @@ public interface EduResearchMemberService extends IService<EduResearchMember> {
     void addResearchMembers(Long researchId, List<BasicMemberVo> members);
 
     void updateResearchMembers(Long id, List<BasicMemberVo> members);
+
+    List<EduMember> getFullMembersByResearchId(Long id);
 }

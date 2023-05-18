@@ -1,5 +1,6 @@
 package com.venson.changliulabstandalone.service.admin;
 
+import com.venson.changliulabstandalone.entity.inter.ReviewAble;
 import com.venson.changliulabstandalone.entity.pojo.EduActivityPublished;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.venson.changliulabstandalone.entity.front.dto.ActivityFrontBriefDTO;
@@ -19,4 +20,6 @@ public interface EduActivityPublishedService extends IService<EduActivityPublish
 //    PageResponse<EduActivityPublished> getPageActivityList(Integer page, Integer limit);
 
     List<ActivityFrontBriefDTO> getFrontIndexActivity();
+
+    ReviewAble getReviewById(Long refId);
 }

@@ -2,11 +2,14 @@ package com.venson.changliulabstandalone.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.venson.changliulabstandalone.entity.pojo.EduMember;
 import com.venson.changliulabstandalone.entity.pojo.EduResearchMember;
 import com.venson.changliulabstandalone.entity.vo.BasicMemberVo;
 import com.venson.changliulabstandalone.mapper.EduResearchMemberMapper;
+import com.venson.changliulabstandalone.service.admin.EduMemberService;
 import com.venson.changliulabstandalone.service.admin.EduResearchMemberService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +28,9 @@ import java.util.stream.Collectors;
  * @since 2023-02-27
  */
 @Service
+@RequiredArgsConstructor
 public class EduResearchMemberServiceImp extends ServiceImpl<EduResearchMemberMapper, EduResearchMember> implements EduResearchMemberService {
+    private final EduMemberService memberService;
 
     @Override
     public List<BasicMemberVo> getMembersByResearchId(Long id) {
@@ -102,5 +107,18 @@ public class EduResearchMemberServiceImp extends ServiceImpl<EduResearchMemberMa
 
 
 
+    }
+
+    @Override
+    public List<EduMember> getFullMembersByResearchId(Long id) {
+
+        LambdaQueryWrapper<EduResearchMember> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(EduResearchMember::getResearchId, id).select(EduResearchMember::getMemberId);
+
+        List<EduResearchMember> researchMembers = baseMapper.selectList(wrapper);
+        List<Long> memberIds = researchMembers.stream().map(EduResearchMember::getMemberId).toList();
+        LambdaQueryWrapper<EduMember> memberWrapper = Wrappers.lambdaQuery();
+        memberWrapper.in(EduMember::getId, memberIds).select(EduMember::getId, EduMember::getAvatar, EduMember::getName);
+        return memberService.list(memberWrapper);
     }
 }

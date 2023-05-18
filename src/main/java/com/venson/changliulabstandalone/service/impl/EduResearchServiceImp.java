@@ -3,9 +3,9 @@ package com.venson.changliulabstandalone.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.venson.changliulabstandalone.entity.dto.AdminResearchDTO;
-import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
-import com.venson.changliulabstandalone.entity.pojo.EduActivity;
+import com.venson.changliulabstandalone.entity.dto.*;
+import com.venson.changliulabstandalone.entity.inter.ReviewAble;
+import com.venson.changliulabstandalone.entity.pojo.EduMember;
 import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.entity.vo.BasicMemberVo;
 import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
@@ -15,7 +15,6 @@ import com.venson.changliulabstandalone.utils.Assert;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.utils.PageUtil;
 import com.venson.changliulabstandalone.entity.pojo.EduResearch;
-import com.venson.changliulabstandalone.entity.dto.ResearchDTO;
 import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
 import com.venson.changliulabstandalone.mapper.EduResearchMapper;
 import com.venson.changliulabstandalone.service.admin.EduResearchService;
@@ -24,16 +23,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -178,5 +174,17 @@ public class EduResearchServiceImp extends ServiceImpl<EduResearchMapper, EduRes
                 .refId(review.getRefId())
                 .build()
         ).collect(Collectors.toList());
+    }
+
+    @Override
+    public ReviewAble getReviewById(Long id) {
+
+        EduResearch eduResearch = baseMapper.selectById(id);
+        ShowResearchDTO applied= new ShowResearchDTO();
+        applied.setHtml(eduResearch.getHtmlBrBase64());
+        applied.setTitle(eduResearch.getTitle());
+        List<EduMember> members = researchMemberService.getFullMembersByResearchId(id);
+        applied.setMembers(members);
+        return applied;
     }
 }

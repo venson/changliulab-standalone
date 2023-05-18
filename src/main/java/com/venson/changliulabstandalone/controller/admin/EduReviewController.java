@@ -1,24 +1,22 @@
 package com.venson.changliulabstandalone.controller.admin;
 
-import com.alibaba.cola.statemachine.StateMachine;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.venson.changliulabstandalone.entity.dto.ReviewApplyVo;
 import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
+import com.venson.changliulabstandalone.entity.dto.ReviewDTO;
+import com.venson.changliulabstandalone.entity.enums.ReviewAction;
+import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
+import com.venson.changliulabstandalone.entity.enums.ReviewType;
+import com.venson.changliulabstandalone.entity.inter.ReviewAble;
 import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.entity.vo.admin.ListQueryParams;
 import com.venson.changliulabstandalone.service.admin.EduReviewService;
 import com.venson.changliulabstandalone.statemachine.StateMachineFactory;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.utils.ResUtils;
-import com.venson.changliulabstandalone.utils.Result;
-import com.venson.changliulabstandalone.entity.dto.ReviewApplyVo;
-import com.venson.changliulabstandalone.entity.dto.ReviewDTO;
-import com.venson.changliulabstandalone.entity.enums.ReviewAction;
-import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
-import com.venson.changliulabstandalone.entity.enums.ReviewType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -45,14 +43,6 @@ public class EduReviewController {
 
     private final StateMachineFactory<ReviewStatus, ReviewAction,ReviewApplyVo> stateMachineFactory;
 
-    private final StateMachine<ReviewStatus, ReviewAction,ReviewApplyVo> courseStateMachine;
-    private final StateMachine<ReviewStatus, ReviewAction,ReviewApplyVo> researchStateMachine;
-    private final StateMachine<ReviewStatus, ReviewAction,ReviewApplyVo> methodologyStateMachine;
-    private  final StateMachine<ReviewStatus, ReviewAction,ReviewApplyVo> activityStateMachine;
-    private final StateMachine<ReviewStatus, ReviewAction,ReviewApplyVo> chapterStateMachine;
-
-    private final StateMachine<ReviewStatus, ReviewAction,ReviewApplyVo> sectionStateMachine;
-    private final StateMachine<ReviewStatus, ReviewAction,ReviewApplyVo> reportStateMachine;
 
     /**
      * get review history of the chapter
@@ -93,10 +83,15 @@ public class EduReviewController {
 //        }
         return ResUtils.ok();
     }
-    @GetMapping(value = "{id}",params = {"type"})
-    public ResponseEntity<List<ReviewDTO>> getReviewListByRefId(@PathVariable Long id, @RequestParam ReviewType type){
-        List<ReviewDTO> reviews = reviewService.getReviewListByRefId(id,type);
-        return ResUtils.ok(reviews);
+//    @GetMapping(value = "{id}",params = {"type"})
+//    public ResponseEntity<List<ReviewDTO>> getReviewListByRefId(@PathVariable Long id, @RequestParam ReviewType type){
+//        List<ReviewDTO> reviews = reviewService.getReviewListByRefId(id,type);
+//        return ResUtils.ok(reviews);
+//    }
+    @GetMapping("{id}")
+    public ResponseEntity<ReviewDTO<ReviewAble>> getReviewById(@PathVariable  Long id){
+        ReviewDTO<ReviewAble> review = reviewService.getReviewById(id);
+        return ResponseEntity.ok(review);
     }
 
 }

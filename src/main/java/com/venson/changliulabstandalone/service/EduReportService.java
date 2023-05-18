@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.venson.changliulabstandalone.entity.dto.AdminReportDTO;
 import com.venson.changliulabstandalone.entity.dto.AdminReportPreviewDTO;
 import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
+import com.venson.changliulabstandalone.entity.dto.ReviewDTO;
 import com.venson.changliulabstandalone.entity.enums.PageType;
+import com.venson.changliulabstandalone.entity.inter.ReviewAble;
 import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.utils.PageResponse;
 
@@ -38,4 +40,6 @@ public interface EduReportService extends IService<EduReport> {
     void switchEnableById(Long id);
 
     Collection<? extends ReviewBasicDTO> getInfoByReviews(List<EduReview> orDefault);
+
+    ReviewAble getReviewById(Long refId);
 }

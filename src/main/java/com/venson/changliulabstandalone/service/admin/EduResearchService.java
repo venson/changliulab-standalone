@@ -1,15 +1,13 @@
 package com.venson.changliulabstandalone.service.admin;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.venson.changliulabstandalone.entity.dto.AdminResearchDTO;
-import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
+import com.venson.changliulabstandalone.entity.dto.*;
+import com.venson.changliulabstandalone.entity.inter.ReviewAble;
 import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.entity.pojo.EduResearch;
-import com.venson.changliulabstandalone.entity.dto.ResearchDTO;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -43,4 +41,6 @@ public interface EduResearchService extends IService<EduResearch> {
     PageResponse<EduResearch> getResearchPage(PageQueryVo pageQueryVo);
 
     List<ReviewBasicDTO> getInfoByReviews(List<EduReview> orDefault);
+
+    ReviewAble getReviewById(Long refId);
 }

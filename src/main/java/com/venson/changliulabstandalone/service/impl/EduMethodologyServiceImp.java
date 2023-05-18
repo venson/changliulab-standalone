@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulabstandalone.constant.FrontCacheConst;
 import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
+import com.venson.changliulabstandalone.entity.dto.ShowMethodologyDTO;
+import com.venson.changliulabstandalone.entity.inter.ReviewAble;
 import com.venson.changliulabstandalone.entity.pojo.EduResearch;
 import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.entity.vo.admin.AdminMethodologyVo;
@@ -177,6 +179,14 @@ public class EduMethodologyServiceImp extends ServiceImpl<EduMethodologyMapper, 
                 .refId(review.getRefId())
                 .build()
         ).collect(Collectors.toList());
+    }
+
+    @Override
+    public ReviewAble getReviewById(Long refId) {
+        EduMethodology eduMethodology = baseMapper.selectById(refId);
+        return ShowMethodologyDTO.builder().isPublic(eduMethodology.getIsPublic())
+                .html(eduMethodology.getHtmlBrBase64())
+                .title(eduMethodology.getTitle()).build();
     }
 
     private boolean checkTitleUsable(@NotNull  String title, @Nullable Long id) {

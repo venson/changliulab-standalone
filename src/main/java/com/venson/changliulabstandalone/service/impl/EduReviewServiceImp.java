@@ -6,19 +6,23 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
 import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
+import com.venson.changliulabstandalone.entity.inter.ReviewAble;
 import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.entity.pojo.EduReviewMsg;
 import com.venson.changliulabstandalone.entity.dto.ReviewDTO;
 import com.venson.changliulabstandalone.entity.enums.ReviewType;
 import com.venson.changliulabstandalone.entity.vo.admin.ListQueryParams;
 import com.venson.changliulabstandalone.mapper.EduReviewMapper;
+import com.venson.changliulabstandalone.service.EduReportPublishedService;
 import com.venson.changliulabstandalone.service.EduReportService;
 import com.venson.changliulabstandalone.service.admin.*;
+import com.venson.changliulabstandalone.utils.Assert;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.utils.PageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -41,10 +45,14 @@ public class EduReviewServiceImp extends ServiceImpl<EduReviewMapper, EduReview>
     private final EduReviewMsgService reviewMsgService;
 
     private final EduActivityService activityService;
+    private final EduActivityPublishedService activityPublishedService;
     private final EduCourseService courseService;
     private final EduMethodologyService methodologyService;
+    private final EduMethodologyPublishedService methodologyPublishedService;
     private final EduResearchService researchService;
+    private final EduResearchPublishedService researchPublishedService;
     private final EduReportService reportService;
+    private final EduReportPublishedService reportPublishedService;
 
     @Override
     public List<EduReview> getReviewByMethodologyId(Long id) {
@@ -115,6 +123,51 @@ public class EduReviewServiceImp extends ServiceImpl<EduReviewMapper, EduReview>
 
         return PageUtil.toBean(pageNew);
     }
+
+    @Override
+    public ReviewDTO<ReviewAble> getReviewById(Long id) {
+        EduReview eduReview = baseMapper.selectById(id);
+        Assert.notNull(eduReview,"Review not found");
+        ReviewDTO<ReviewAble> review = new ReviewDTO<>() ;
+        BeanUtils.copyProperties(eduReview,review);
+
+        handleReviewContent(review, eduReview.getRefId(), eduReview.getRefType());
+        review.setMessages(reviewMsgService.getReviewMessageById(id));
+
+
+        return review;
+    }
+
+    private void handleReviewContent(ReviewDTO<ReviewAble> review, Long refId, ReviewType type) {
+            switch (type){
+                case RESEARCH -> {
+                    review.setApplied(researchService.getReviewById(refId));
+                    review.setReviewed(researchPublishedService.getReviewById(refId));
+                }
+
+                case ACTIVITY -> {
+                    review.setApplied(activityService.getReviewById(refId));
+                    review.setReviewed(activityPublishedService.getReviewById(refId));
+                }
+
+                case METHODOLOGY-> {
+
+                    review.setApplied(methodologyService.getReviewById(refId));
+                    review.setReviewed(methodologyPublishedService.getReviewById(refId));
+                }
+
+                case REPORT-> {
+
+                    review.setApplied(reportService.getReviewById(refId));
+                    review.setReviewed(reportPublishedService.getReviewById(refId));
+                }
+                default -> {
+                }
+//                        review = courseService.getReviewById(eduReview.getId(),eduReview.getRefType());
+            }
+
+    }
+
 
     private List<ReviewBasicDTO> handleReviews(List<EduReview> reviews) {
         List<ReviewBasicDTO> dataList = new ArrayList<>();

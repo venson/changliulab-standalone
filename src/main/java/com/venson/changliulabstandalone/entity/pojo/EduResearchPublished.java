@@ -1,14 +1,13 @@
 package com.venson.changliulabstandalone.entity.pojo;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import com.venson.changliulabstandalone.entity.enums.LanguageEnum;
+import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -17,19 +16,23 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author venson
- * @since 2022-08-09
+ * @since 2022-07-04
  */
 @Getter
 @Setter
-@TableName("edu_activity_published")
-public class EduActivityPublished implements Serializable {
+@TableName("edu_research_published")
+public class EduResearchPublished implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 12312525L;
 
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
+    private String markdown;
     private String title;
+
+    private String htmlBrBase64;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime gmtCreate;
@@ -37,15 +40,6 @@ public class EduActivityPublished implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime gmtModified;
 
-    private LocalDate activityDate;
-
-    private Long authorMemberId;
-
-    private String authorMemberName;
-
-
-    private Boolean isPublished;
     private Boolean enable;
-
 
 }

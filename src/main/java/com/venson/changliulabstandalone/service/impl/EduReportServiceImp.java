@@ -11,6 +11,7 @@ import com.venson.changliulabstandalone.entity.dto.AdminReportPreviewDTO;
 import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
 import com.venson.changliulabstandalone.entity.enums.PageType;
 import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
+import com.venson.changliulabstandalone.entity.inter.ReviewAble;
 import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.mapper.EduReportMapper;
 import com.venson.changliulabstandalone.service.EduReportMarkdownService;
@@ -143,6 +144,11 @@ public class EduReportServiceImp extends ServiceImpl<EduReportMapper, EduReport>
                 .refId(review.getRefId())
                 .build()
         ).collect(Collectors.toList());
+    }
+
+    @Override
+    public ReviewAble getReviewById(Long refId) {
+        return null;
     }
 
     /**

@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulabstandalone.constant.FrontCacheConst;
+import com.venson.changliulabstandalone.entity.dto.ActivityShowDTO;
 import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
+import com.venson.changliulabstandalone.entity.inter.ReviewAble;
 import com.venson.changliulabstandalone.entity.pojo.*;
 import com.venson.changliulabstandalone.entity.vo.admin.PageQueryVo;
 import com.venson.changliulabstandalone.utils.Assert;
@@ -20,9 +22,9 @@ import com.venson.changliulabstandalone.service.admin.EduActivityMarkdownService
 import com.venson.changliulabstandalone.service.admin.EduActivityPublishedMdService;
 import com.venson.changliulabstandalone.service.admin.EduActivityPublishedService;
 import com.venson.changliulabstandalone.service.admin.EduActivityService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
@@ -46,15 +48,12 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class EduActivityServiceImp extends ServiceImpl<EduActivityMapper, EduActivity> implements EduActivityService {
 
-    @Autowired
-    private EduActivityMarkdownService activityMarkdownService;
-
-    @Autowired
-    private EduActivityPublishedService publishedService;
-    @Autowired
-    private EduActivityPublishedMdService publishedMdService;
+    private final EduActivityMarkdownService markdownService;
+    private final EduActivityPublishedService publishedService;
+    private final EduActivityPublishedMdService publishedMdService;
 
     @Override
     public PageResponse<EduActivity> getPageReviewList(Integer page, Integer limit) {
@@ -114,10 +113,10 @@ public class EduActivityServiceImp extends ServiceImpl<EduActivityMapper, EduAct
         activity.setIsModified(true);
         baseMapper.updateById(activity);
 
-        EduActivityMarkdown markdown = activityMarkdownService.getById(id);
+        EduActivityMarkdown markdown = markdownService.getById(id);
         markdown.setMarkdown(activityAdminDTO.getMarkdown());
         markdown.setHtmlBrBase64(activityAdminDTO.getHtmlBrBase64());
-        activityMarkdownService.updateById(markdown);
+        markdownService.updateById(markdown);
     }
 
     @Override
@@ -126,7 +125,7 @@ public class EduActivityServiceImp extends ServiceImpl<EduActivityMapper, EduAct
         EduActivity activity = baseMapper.selectById(id);
         if (activity.getReview() == null || activity.getReview() == ReviewStatus.NONE) {
             baseMapper.deleteById(id);
-            activityMarkdownService.removeById(id);
+            markdownService.removeById(id);
         } else {
             activity.setIsRemoveAfterReview(true);
             baseMapper.updateById(activity);
@@ -138,7 +137,7 @@ public class EduActivityServiceImp extends ServiceImpl<EduActivityMapper, EduAct
     public ActivityAdminDTO getActivityById(Long id) {
 
         EduActivity eduActivity = baseMapper.selectById(id);
-        EduActivityMarkdown markdown = activityMarkdownService.getById(id);
+        EduActivityMarkdown markdown = markdownService.getById(id);
         ActivityAdminDTO activity = new ActivityAdminDTO();
         BeanUtils.copyProperties(eduActivity, activity);
         activity.setMarkdown(markdown.getMarkdown());
@@ -150,7 +149,7 @@ public class EduActivityServiceImp extends ServiceImpl<EduActivityMapper, EduAct
         EduActivity activity = baseMapper.selectById(id);
         ActivityPreviewDTO preview = new ActivityPreviewDTO();
         BeanUtils.copyProperties(activity, preview);
-        EduActivityMarkdown markdown = activityMarkdownService.getById(id);
+        EduActivityMarkdown markdown = markdownService.getById(id);
         EduActivityPublishedMd publishedMd = publishedMdService.getById(id);
 
         preview.setHtmlBrBase64(markdown.getHtmlBrBase64());
@@ -168,7 +167,7 @@ public class EduActivityServiceImp extends ServiceImpl<EduActivityMapper, EduAct
 //        eduActivityMarkdown.setMarkdown(activityDTO.getMarkdown());
 //        eduActivityMarkdown.setHtmlBrBase64(activityDTO.getHtmlBrBase64());
         eduActivityMarkdown.setId(eduActivity.getId());
-        activityMarkdownService.save(eduActivityMarkdown);
+        markdownService.save(eduActivityMarkdown);
         return eduActivity.getId();
     }
 
@@ -207,6 +206,17 @@ public class EduActivityServiceImp extends ServiceImpl<EduActivityMapper, EduAct
                 .refId(review.getRefId())
                 .build()
         ).collect(Collectors.toList());
+    }
+
+    @Override
+    public ReviewAble getReviewById(Long refId) {
+        EduActivity eduActivity = baseMapper.selectById(refId);
+        EduActivityMarkdown markdown = markdownService.getById(refId);
+        ActivityShowDTO activityShowDTO = new ActivityShowDTO();
+        activityShowDTO.setDate(eduActivity.getActivityDate());
+        activityShowDTO.setHtml(markdown.getHtmlBrBase64());
+        activityShowDTO.setTitle(eduActivity.getTitle());
+        return activityShowDTO;
     }
 
     private void copyActivityBean(ActivityAdminDTO source, EduActivity target) {

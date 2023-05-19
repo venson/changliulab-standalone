@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -37,12 +38,12 @@ public class AuthConfig {
     private final AuthenticationEntryPoint authEntryPoint;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
-        .authorizeHttpRequests((matcher) ->matcher
-                .requestMatchers( "/auth/admin/login", "/auth/front/login").anonymous())
-        .authorizeHttpRequests((matcher) ->matcher
-                .requestMatchers("*/front/**").permitAll())
-                .authorizeHttpRequests((authorize) ->authorize.anyRequest().authenticated())
+        http.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests((matcher) -> matcher
+                        .requestMatchers("/auth/admin/login", "/auth/front/login").anonymous())
+                .authorizeHttpRequests((matcher) -> matcher
+                        .requestMatchers("*/front/**").permitAll())
+                .authorizeHttpRequests((authorize) -> authorize.anyRequest().authenticated())
 //        authorizeHttpRequests((matchers) ->matchers.requestMatchers(HttpMethod.GET,
 //                        "/swagger-ui.html",
 //                        "/swagger-ui/",
@@ -57,11 +58,13 @@ public class AuthConfig {
 //        httpBasic().disable().formLogin().disable()
 //        http.csrf().disable().httpBasic().disable();
 
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-        .addFilterBefore(new AuthTokenFilter(tokenManager, redisTemplate, pathAdapter), UsernamePasswordAuthenticationFilter.class)
-//                .oauth2ResourceServer(oauth-> oauth.jwt(jwt->jwt.jwtAuthenticationConverter()))
-                .exceptionHandling()
-                .authenticationEntryPoint(authEntryPoint);
+                .sessionManagement((session) ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                .and()
+                .addFilterBefore(new AuthTokenFilter(tokenManager, redisTemplate, pathAdapter), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling((httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
+                        .authenticationEntryPoint(authEntryPoint)));
+//                .authenticationEntryPoint(authEntryPoint);
 //                .addFilterBefore(new AuthTokenFilter(tokenManager, redisTemplate, pathAdapter), BasicAuthenticationFilter.class);
         return http.build();
 

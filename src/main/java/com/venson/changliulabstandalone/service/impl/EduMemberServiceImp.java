@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulabstandalone.constant.FrontCacheConst;
+import com.venson.changliulabstandalone.entity.dto.AvatarDTO;
 import com.venson.changliulabstandalone.entity.dto.MemberQuery;
 import com.venson.changliulabstandalone.entity.enums.MemberLevel;
 import com.venson.changliulabstandalone.entity.front.dto.MemberFrontBriefDTO;
@@ -146,5 +147,15 @@ public class EduMemberServiceImp extends ServiceImpl<EduMemberMapper, EduMember>
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return eduMember;
+    }
+
+    @Override
+    public AvatarDTO getMemberAvatarById(long id) {
+        EduMember eduMember = baseMapper.selectById(id);
+        return AvatarDTO.builder()
+                .avatar(eduMember.getAvatar())
+                .id(eduMember.getId())
+                .name(eduMember.getName())
+                .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.venson.changliulabstandalone.service.admin;
 
+import com.venson.changliulabstandalone.entity.dto.AvatarDTO;
 import com.venson.changliulabstandalone.entity.vo.admin.AdminMemberVo;
 import com.venson.changliulabstandalone.entity.vo.admin.ListQueryParams;
 import com.venson.changliulabstandalone.utils.PageResponse;
@@ -38,4 +39,6 @@ public interface EduMemberService extends IService<EduMember> {
     PageResponse<EduMember> getMemberPage(ListQueryParams pageVo);
 
     EduMember getMemberById(Long id);
+
+    AvatarDTO getMemberAvatarById(long id);
 }

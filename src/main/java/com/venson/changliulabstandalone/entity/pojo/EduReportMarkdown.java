@@ -1,4 +1,4 @@
-package com.venson.changliulabstandalone.entity;
+package com.venson.changliulabstandalone.entity.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

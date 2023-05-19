@@ -1,6 +1,6 @@
 package com.venson.changliulabstandalone.service;
 
-import com.venson.changliulabstandalone.entity.EduReportPublished;
+import com.venson.changliulabstandalone.entity.pojo.EduReportPublished;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.venson.changliulabstandalone.entity.front.dto.ReportFrontDTO;
 import com.venson.changliulabstandalone.entity.inter.ReviewAble;

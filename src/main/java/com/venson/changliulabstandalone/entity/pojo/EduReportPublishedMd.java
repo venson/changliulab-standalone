@@ -1,4 +1,4 @@
-package com.venson.changliulabstandalone.entity;
+package com.venson.changliulabstandalone.entity.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -26,7 +26,7 @@ public class EduReportPublishedMd implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
 
     private String markdown;

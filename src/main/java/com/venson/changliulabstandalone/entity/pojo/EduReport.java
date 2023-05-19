@@ -1,4 +1,4 @@
-package com.venson.changliulabstandalone.entity;
+package com.venson.changliulabstandalone.entity.pojo;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.annotation.Version;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+
+import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,8 +25,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("edu_report_published")
-public class EduReportPublished implements Serializable {
+@TableName("edu_report")
+public class EduReport implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -32,11 +34,24 @@ public class EduReportPublished implements Serializable {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
+    /**
+     * title of report
+     */
     private String title;
 
-    private Long authorMemberId;
+    /**
+     * member id of the author
+     */
+    private Long speakerId;
 
-    private String authorMemberName;
+    private String videoLink;
+
+
+    private Boolean isPublished;
+
+    private Boolean isModified;
+
+    private Boolean isRemoveAfterReview;
 
     private Boolean enable;
 
@@ -48,4 +63,6 @@ public class EduReportPublished implements Serializable {
 
     @Version
     private Long version;
+
+    private ReviewStatus review;
 }

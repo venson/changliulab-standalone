@@ -3,29 +3,25 @@ package com.venson.changliulabstandalone.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.venson.changliulabstandalone.entity.EduReport;
-import com.venson.changliulabstandalone.entity.EduReportMarkdown;
-import com.venson.changliulabstandalone.entity.EduReportPublishedMd;
-import com.venson.changliulabstandalone.entity.dto.AdminReportDTO;
-import com.venson.changliulabstandalone.entity.dto.AdminReportPreviewDTO;
-import com.venson.changliulabstandalone.entity.dto.ReviewBasicDTO;
+import com.venson.changliulabstandalone.entity.pojo.*;
+import com.venson.changliulabstandalone.entity.dto.*;
 import com.venson.changliulabstandalone.entity.enums.PageType;
 import com.venson.changliulabstandalone.entity.enums.ReviewStatus;
 import com.venson.changliulabstandalone.entity.inter.ReviewAble;
-import com.venson.changliulabstandalone.entity.pojo.EduReview;
 import com.venson.changliulabstandalone.mapper.EduReportMapper;
 import com.venson.changliulabstandalone.service.EduReportMarkdownService;
 import com.venson.changliulabstandalone.service.EduReportPublishedMdService;
 import com.venson.changliulabstandalone.service.EduReportService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.venson.changliulabstandalone.service.admin.EduMemberService;
 import com.venson.changliulabstandalone.utils.Assert;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.utils.PageUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -41,11 +37,11 @@ import java.util.stream.Collectors;
  * @since 2023-03-23
  */
 @Service
+@RequiredArgsConstructor
 public class EduReportServiceImp extends ServiceImpl<EduReportMapper, EduReport> implements EduReportService {
-    @Autowired
-    private EduReportMarkdownService reportMarkdownService;
-    @Autowired
-    private EduReportPublishedMdService reportPublishedMdService;
+    private final EduReportMarkdownService reportMarkdownService;
+    private final EduReportPublishedMdService reportPublishedMdService;
+    private  final EduMemberService memberService;
 
     @Override
     public PageResponse<EduReport> getPageReport(int current, int size, PageType type) {
@@ -129,7 +125,7 @@ public class EduReportServiceImp extends ServiceImpl<EduReportMapper, EduReport>
     }
 
     @Override
-    public Collection<? extends ReviewBasicDTO> getInfoByReviews(List<EduReview> reviews) {
+    public List<ReviewBasicDTO> getInfoByReviews(List<EduReview> reviews) {
 
         if(reviews.isEmpty()){
             return Collections.emptyList();
@@ -148,7 +144,15 @@ public class EduReportServiceImp extends ServiceImpl<EduReportMapper, EduReport>
 
     @Override
     public ReviewAble getReviewById(Long refId) {
-        return null;
+
+        EduReport  report= baseMapper.selectById(refId);
+        AvatarDTO avatar = memberService.getMemberAvatarById(refId);
+        EduReportMarkdown markdown = reportMarkdownService.getById(refId);
+        return ShowReportDTO.builder().title(report.getTitle())
+                .html(markdown.getHtmlBrBase64())
+                .videoLink(report.getVideoLink())
+                .speaker(avatar)
+                .build();
     }
 
     /**

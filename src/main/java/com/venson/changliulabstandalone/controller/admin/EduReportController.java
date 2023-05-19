@@ -1,14 +1,13 @@
 package com.venson.changliulabstandalone.controller.admin;
 
-import com.venson.changliulabstandalone.entity.EduReport;
+import com.venson.changliulabstandalone.entity.pojo.EduReport;
 import com.venson.changliulabstandalone.entity.dto.AdminReportDTO;
 import com.venson.changliulabstandalone.entity.dto.AdminReportPreviewDTO;
 import com.venson.changliulabstandalone.entity.enums.PageType;
 import com.venson.changliulabstandalone.service.EduReportService;
 import com.venson.changliulabstandalone.utils.PageResponse;
 import com.venson.changliulabstandalone.utils.ResUtils;
-import com.venson.changliulabstandalone.utils.Result;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +22,10 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/eduservice/admin/edu-report")
-
+@RequiredArgsConstructor
 public class EduReportController {
 
-    @Autowired
-    private EduReportService reportService;
+    private final EduReportService reportService;
     @GetMapping(value = "{current}/{size}", params = "type")
     @PreAuthorize("hasAuthority('Report.READ')")
     public ResponseEntity<PageResponse<EduReport>> getPageReport(@PathVariable int current, @PathVariable int size,

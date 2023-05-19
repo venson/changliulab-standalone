@@ -1,6 +1,6 @@
 package com.venson.changliulabstandalone.mapper;
 
-import com.venson.changliulabstandalone.entity.EduReport;
+import com.venson.changliulabstandalone.entity.pojo.EduReport;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.venson.changliulab.mapper.EduCoursePublishedMapper">
+
+    <select id="getFrontIndexCourse" resultType="com.venson.changliulab.entity.front.dto.CourseFrontBriefDTO">
+        select id, cover, view_count, title, is_public
+        from edu_course_published
+        order by view_count desc
+        limit 8
+    </select>
+</mapper>

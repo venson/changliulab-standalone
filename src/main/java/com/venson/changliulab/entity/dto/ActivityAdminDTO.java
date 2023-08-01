@@ -1,0 +1,40 @@
+package com.venson.changliulab.entity.dto;
+
+import com.venson.changliulab.entity.enums.ReviewStatus;
+import lombok.Data;
+
+import jakarta.validation.constraints.NotBlank;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDate;
+
+@Data
+public class ActivityAdminDTO implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private Long id;
+
+    @NotBlank(message = "Title can not be empty")
+    private String title;
+
+    @NotBlank
+    private LocalDate activityDate;
+
+    private Long authorMemberId;
+
+    private String authorMemberName;
+
+    private Long lastModifiedMemberId;
+
+    private Boolean isPublished;
+
+    private Boolean isModified;
+
+    private ReviewStatus review;
+
+    private String htmlBrBase64;
+    private String markdown;
+
+    private Boolean isRemoveAfterReview;
+}

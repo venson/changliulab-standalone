@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.venson.changliulab.mapper.EduMemberMapper">
+
+    <select id="getFrontIndexMember" resultType="com.venson.changliulab.entity.front.dto.MemberFrontBriefDTO">
+        select id, name, intro, avatar,title
+            from edu_member
+where level=5
+limit 4
+    </select>
+</mapper>

@@ -1,22 +1,22 @@
 package com.venson.changliulab.controller.admin;
 
 import com.venson.changliulab.entity.dto.AdminResearchDTO;
-import com.venson.changliulab.entity.vo.admin.CommonMetaVo;
-import com.venson.changliulab.entity.vo.admin.PageQueryVo;
-import com.venson.changliulab.utils.PageResponse;
-import com.venson.changliulab.utils.ResUtils;
+import com.venson.changliulab.entity.dto.ResearchPreviewDTO;
 import com.venson.changliulab.entity.pojo.EduResearch;
 import com.venson.changliulab.entity.pojo.EduReview;
-import com.venson.changliulab.entity.dto.ResearchPreviewDTO;
+import com.venson.changliulab.entity.vo.admin.CommonMetaVo;
+import com.venson.changliulab.entity.vo.admin.PageQueryVo;
 import com.venson.changliulab.service.admin.EduResearchService;
 import com.venson.changliulab.service.admin.EduReviewService;
+import com.venson.changliulab.utils.PageResponse;
+import com.venson.changliulab.utils.ResUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 /**
@@ -57,9 +57,7 @@ public class EduResearchController {
     @GetMapping("{id}")
     @PreAuthorize("hasAuthority('Research.READ')")
     public ResponseEntity<AdminResearchDTO> getResearch(@PathVariable Long id, CommonMetaVo vo){
-        log.error(vo.type());
-        log.error(id.toString());
-        AdminResearchDTO researchDTO = service.getResearchById(id);
+        AdminResearchDTO researchDTO = service.getResearchById(id,vo);
         return ResponseEntity.ok(researchDTO);
     }
     @GetMapping("preview/{id}")

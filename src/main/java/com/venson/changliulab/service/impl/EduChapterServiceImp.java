@@ -7,12 +7,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulab.entity.dto.ChapterContentDTO;
 import com.venson.changliulab.entity.dto.ReviewTargetDTO;
 import com.venson.changliulab.entity.dto.ShowChapterDTO;
-import com.venson.changliulab.entity.dto.ShowSectionDTO;
 import com.venson.changliulab.entity.enums.ReviewStatus;
+import com.venson.changliulab.entity.front.dto.ChapterFrontDTO;
 import com.venson.changliulab.entity.inter.ReviewAble;
 import com.venson.changliulab.entity.pojo.*;
 import com.venson.changliulab.entity.vo.CourseTreeNodeVo;
-import com.venson.changliulab.entity.front.dto.ChapterFrontDTO;
+import com.venson.changliulab.entity.vo.admin.CommonMetaVo;
 import com.venson.changliulab.entity.vo.admin.ReviewSMContext;
 import com.venson.changliulab.exception.CustomizedException;
 import com.venson.changliulab.mapper.EduChapterMapper;
@@ -126,7 +126,7 @@ public class EduChapterServiceImp extends ServiceImpl<EduChapterMapper, EduChapt
     }
 
     @Override
-    public ChapterContentDTO getChapterDTOById(Long chapterId) {
+    public ChapterContentDTO getChapterDTOById(Long chapterId, CommonMetaVo vo) {
         EduChapter chapter = baseMapper.selectById(chapterId);
         EduChapterDescription desc = descService.getById(chapterId);
         ChapterContentDTO chapterContentDTO = new ChapterContentDTO();

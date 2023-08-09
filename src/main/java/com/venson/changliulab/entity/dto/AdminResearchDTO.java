@@ -2,7 +2,6 @@ package com.venson.changliulab.entity.dto;
 
 import com.venson.changliulab.entity.enums.LanguageEnum;
 import com.venson.changliulab.entity.enums.ReviewStatus;
-import com.venson.changliulab.entity.vo.BasicMemberVo;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +23,7 @@ public class AdminResearchDTO {
     private LanguageEnum language;
     private ReviewStatus review;
     private List<Long> memberIds;
+    private Boolean isModified;
 //    private List<BasicMemberVo> members;
     private List<AvatarDTO> members;
 }

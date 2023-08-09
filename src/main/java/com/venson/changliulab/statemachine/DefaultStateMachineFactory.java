@@ -1,17 +1,13 @@
 package com.venson.changliulab.statemachine;
 
 import com.alibaba.cola.statemachine.StateMachine;
-import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
-import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import com.venson.changliulab.entity.enums.ReviewAction;
 import com.venson.changliulab.entity.enums.ReviewStatus;
 import com.venson.changliulab.entity.enums.ReviewType;
-import com.venson.changliulab.entity.statemachine.StateMachineConstant;
 import com.venson.changliulab.entity.vo.admin.ReviewItemVo;
 import com.venson.changliulab.entity.vo.admin.ReviewSMContext;
 import com.venson.changliulab.entity.vo.admin.ReviewVo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

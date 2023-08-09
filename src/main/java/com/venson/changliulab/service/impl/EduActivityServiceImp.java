@@ -8,17 +8,17 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulab.constant.FrontCacheConst;
 import com.venson.changliulab.entity.dto.*;
+import com.venson.changliulab.entity.enums.ReviewStatus;
 import com.venson.changliulab.entity.inter.ReviewAble;
 import com.venson.changliulab.entity.pojo.*;
 import com.venson.changliulab.entity.vo.admin.CommonMetaVo;
 import com.venson.changliulab.entity.vo.admin.PageQueryVo;
 import com.venson.changliulab.entity.vo.admin.ReviewSMContext;
+import com.venson.changliulab.mapper.EduActivityMapper;
 import com.venson.changliulab.service.admin.*;
 import com.venson.changliulab.utils.Assert;
 import com.venson.changliulab.utils.PageResponse;
 import com.venson.changliulab.utils.PageUtil;
-import com.venson.changliulab.entity.enums.ReviewStatus;
-import com.venson.changliulab.mapper.EduActivityMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -136,7 +136,7 @@ public class EduActivityServiceImp extends ServiceImpl<EduActivityMapper, EduAct
         EduActivity eduActivity = baseMapper.selectById(id);
         EduActivityMarkdown markdown = markdownService.getById(id);
         ActivityAdminDTO activity = new ActivityAdminDTO();
-        BeanUtils.copyProperties(eduActivity, activity);
+        BeanUtils.copyProperties(eduActivity, activity,"markdown","htmlBrBase64");
         if (vo!= null && "preview".equals(vo.type())){
             activity.setHtmlBrBase64(markdown.getHtmlBrBase64());
         }else {

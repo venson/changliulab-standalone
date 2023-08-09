@@ -14,6 +14,6 @@ public enum ResearchMemberStatus implements IEnum<Integer>{
     }
     @Override
     public Integer getValue() {
-        return null;
+        return value;
     }
 }

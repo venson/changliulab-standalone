@@ -3,25 +3,30 @@ package com.venson.changliulab.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.venson.changliulab.entity.dto.*;
-import com.venson.changliulab.entity.enums.ReviewAction;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.venson.changliulab.entity.dto.ReviewTargetDTO;
+import com.venson.changliulab.entity.dto.SectionContentDTO;
+import com.venson.changliulab.entity.dto.SectionPreviewDTO;
+import com.venson.changliulab.entity.dto.ShowSectionDTO;
 import com.venson.changliulab.entity.enums.ReviewStatus;
 import com.venson.changliulab.entity.inter.ReviewAble;
 import com.venson.changliulab.entity.pojo.EduSection;
 import com.venson.changliulab.entity.pojo.EduSectionMarkdown;
 import com.venson.changliulab.entity.pojo.EduSectionPublished;
 import com.venson.changliulab.entity.pojo.EduSectionPublishedMd;
+import com.venson.changliulab.entity.vo.admin.CommonMetaVo;
 import com.venson.changliulab.mapper.EduSectionMapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulab.service.admin.*;
 import com.venson.changliulab.utils.Assert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -61,13 +66,16 @@ public class EduSectionServiceImp extends ServiceImpl<EduSectionMapper, EduSecti
     }
 
     @Override
-    public SectionContentDTO getSectionById(Long sectionId) {
+    public SectionContentDTO getSectionById(Long sectionId, CommonMetaVo vo) {
         EduSection section = baseMapper.selectById(sectionId);
         EduSectionMarkdown sectionMd = markdownService.getById(sectionId);
         SectionContentDTO sectionContentDTO = new SectionContentDTO();
         BeanUtils.copyProperties(section, sectionContentDTO);
-        sectionContentDTO.setMarkdown(sectionMd.getMarkdown());
-        sectionContentDTO.setHtmlBrBase64(sectionMd.getHtmlBrBase64());
+        if (vo != null && "preview".equals(vo.type())){
+            sectionContentDTO.setHtmlBrBase64(sectionMd.getHtmlBrBase64());
+        }else {
+            sectionContentDTO.setMarkdown(sectionMd.getMarkdown());
+        }
         return sectionContentDTO;
     }
 

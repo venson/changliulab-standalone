@@ -1,8 +1,8 @@
 package com.venson.changliulab.controller.admin;
 
-import com.venson.changliulab.utils.ResUtils;
 import com.venson.changliulab.entity.dto.ChapterContentDTO;
 import com.venson.changliulab.entity.front.dto.ChapterFrontDTO;
+import com.venson.changliulab.entity.vo.admin.CommonMetaVo;
 import com.venson.changliulab.service.admin.EduChapterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,8 +36,8 @@ public class EduChapterController {
      */
     @GetMapping("{chapterId}")
     @PreAuthorize("hasAnyAuthority('course.edit.content', 'course.edit.preview')")
-    public ResponseEntity<ChapterContentDTO> getChapterById(@PathVariable Long chapterId){
-        ChapterContentDTO  chapterContentDTO= chapterService.getChapterDTOById(chapterId);
+    public ResponseEntity<ChapterContentDTO> getChapterById(@PathVariable Long chapterId, CommonMetaVo vo){
+        ChapterContentDTO  chapterContentDTO= chapterService.getChapterDTOById(chapterId,vo);
         return ResponseEntity.ok(chapterContentDTO);
     }
     @PostMapping("")

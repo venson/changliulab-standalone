@@ -7,22 +7,23 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.venson.changliulab.entity.dto.*;
 import com.venson.changliulab.entity.enums.ResearchMemberStatus;
+import com.venson.changliulab.entity.enums.ReviewStatus;
 import com.venson.changliulab.entity.inter.ReviewAble;
+import com.venson.changliulab.entity.pojo.EduResearch;
 import com.venson.changliulab.entity.pojo.EduResearchMember;
 import com.venson.changliulab.entity.pojo.EduResearchPublished;
 import com.venson.changliulab.entity.pojo.EduReview;
+import com.venson.changliulab.entity.vo.admin.CommonMetaVo;
 import com.venson.changliulab.entity.vo.admin.PageQueryVo;
 import com.venson.changliulab.exception.CustomizedException;
+import com.venson.changliulab.mapper.EduResearchMapper;
 import com.venson.changliulab.service.admin.EduResearchMemberService;
 import com.venson.changliulab.service.admin.EduResearchPublishedService;
+import com.venson.changliulab.service.admin.EduResearchService;
 import com.venson.changliulab.service.admin.ReviewableService;
 import com.venson.changliulab.utils.Assert;
 import com.venson.changliulab.utils.PageResponse;
 import com.venson.changliulab.utils.PageUtil;
-import com.venson.changliulab.entity.pojo.EduResearch;
-import com.venson.changliulab.entity.enums.ReviewStatus;
-import com.venson.changliulab.mapper.EduResearchMapper;
-import com.venson.changliulab.service.admin.EduResearchService;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -147,12 +148,27 @@ public class EduResearchServiceImp extends ServiceImpl<EduResearchMapper, EduRes
     }
 
     @Override
-    public AdminResearchDTO getResearchById(Long id) {
-        EduResearch research = baseMapper.selectById(id);
+    public AdminResearchDTO getResearchById(Long id, CommonMetaVo vo) {
+
+        LambdaQueryWrapper<EduResearch> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(EduResearch::getId, id);
+
+        if (vo !=null && "preview".equals(vo.type())){
+            wrapper.select(EduResearch::getId, EduResearch::getHtmlBrBase64,
+                    EduResearch::getIsModified, EduResearch::getTitle,
+                    EduResearch::getReview, EduResearch::getIsRemoveAfterReview);
+        }else{
+            wrapper.select(EduResearch::getId,EduResearch::getIsModified,
+                    EduResearch::getMarkdown,EduResearch::getTitle,
+                    EduResearch::getReview,
+                    EduResearch::getIsRemoveAfterReview);
+        }
+
+        EduResearch research = baseMapper.selectOne(wrapper);
 //        List<BasicMemberVo> members = researchMemberService.getMembersByResearchId(id);
         List<AvatarDTO> members = researchMemberService.getFullMembersByResearchId(id, true);
         AdminResearchDTO dto = new AdminResearchDTO();
-        BeanUtils.copyProperties(research, dto, "htmlBrBase64");
+        BeanUtils.copyProperties(research, dto);
         dto.setMembers(members);
         return dto;
     }

@@ -1,5 +1,8 @@
 package com.venson.changliulab.utils;
 
+import lombok.Getter;
+
+@Getter
 public enum ResultCode {
     SUCCESS(20000,"Operation successful"),
     ERROR(20001,"Operation failed"),
@@ -18,7 +21,4 @@ public enum ResultCode {
         this.desc = desc;
     }
 
-    public int getValue(){return value;}
-
-    public String getDesc(){return desc;}
 }

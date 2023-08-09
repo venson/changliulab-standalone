@@ -1,7 +1,6 @@
 package com.venson.changliulab.entity.dto;
 
 import com.venson.changliulab.entity.inter.ReviewAble;
-import com.venson.changliulab.entity.pojo.EduMember;
 import lombok.*;
 
 import java.io.Serial;

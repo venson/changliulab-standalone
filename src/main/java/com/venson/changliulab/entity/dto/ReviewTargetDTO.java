@@ -1,7 +1,6 @@
 package com.venson.changliulab.entity.dto;
 
 import com.venson.changliulab.entity.enums.ReviewStatus;
-import com.venson.changliulab.entity.pojo.EduReview;
 import com.venson.changliulab.entity.pojo.EduReviewMsg;
 import lombok.Builder;
 import lombok.Getter;

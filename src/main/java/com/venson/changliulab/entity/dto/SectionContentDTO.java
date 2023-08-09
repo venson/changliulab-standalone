@@ -19,10 +19,9 @@ public class SectionContentDTO implements Serializable {
     private String title;
 
     private String videoLink;
+    private Boolean isModified;
 
     private ReviewStatus review;
-
-
 
     private Integer sort;
 

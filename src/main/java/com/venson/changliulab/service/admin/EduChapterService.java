@@ -1,11 +1,12 @@
 package com.venson.changliulab.service.admin;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.venson.changliulab.entity.pojo.EduChapter;
 import com.venson.changliulab.entity.dto.ChapterContentDTO;
 import com.venson.changliulab.entity.enums.ReviewStatus;
-import com.venson.changliulab.entity.vo.CourseTreeNodeVo;
 import com.venson.changliulab.entity.front.dto.ChapterFrontDTO;
+import com.venson.changliulab.entity.pojo.EduChapter;
+import com.venson.changliulab.entity.vo.CourseTreeNodeVo;
+import com.venson.changliulab.entity.vo.admin.CommonMetaVo;
 import com.venson.changliulab.entity.vo.admin.ReviewSMContext;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public interface EduChapterService extends IService<EduChapter> {
 
     void updateChapterById(Long chapterId, ChapterFrontDTO chapter);
 
-    ChapterContentDTO getChapterDTOById(Long chapterId);
+    ChapterContentDTO getChapterDTOById(Long chapterId, CommonMetaVo vo);
 
     Long addChapter(ChapterFrontDTO chapterFrontDTO);
 

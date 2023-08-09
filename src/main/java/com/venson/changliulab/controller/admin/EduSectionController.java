@@ -1,8 +1,8 @@
 package com.venson.changliulab.controller.admin;
 
-import com.venson.changliulab.utils.ResUtils;
 import com.venson.changliulab.entity.dto.SectionContentDTO;
 import com.venson.changliulab.entity.dto.SectionPreviewDTO;
+import com.venson.changliulab.entity.vo.admin.CommonMetaVo;
 import com.venson.changliulab.service.admin.EduSectionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +38,8 @@ public class EduSectionController {
      */
     @GetMapping("{sectionId}")
     @PreAuthorize("hasAnyAuthority('course.edit.content', 'course.edit.preview')")
-    public ResponseEntity<SectionContentDTO> getSectionById(@PathVariable Long sectionId){
-        SectionContentDTO section = sectionService.getSectionById(sectionId);
+    public ResponseEntity<SectionContentDTO> getSectionById(@PathVariable Long sectionId, CommonMetaVo vo){
+        SectionContentDTO section = sectionService.getSectionById(sectionId,vo);
         return ResponseEntity.ok(section);
     }
     @Transactional

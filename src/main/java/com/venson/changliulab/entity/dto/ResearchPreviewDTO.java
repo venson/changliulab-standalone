@@ -1,12 +1,11 @@
 package com.venson.changliulab.entity.dto;
 
-import com.venson.changliulab.entity.enums.LanguageEnum;
 import com.venson.changliulab.entity.enums.ReviewStatus;
-import com.venson.changliulab.entity.front.dto.MemberFrontBriefDTO;
-import com.venson.changliulab.entity.front.dto.MemberFrontDTO;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-import jakarta.validation.constraints.NotBlank;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;

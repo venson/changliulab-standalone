@@ -1,11 +1,11 @@
 package com.venson.changliulab.service.admin;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.venson.changliulab.entity.inter.ReviewAble;
-import com.venson.changliulab.entity.pojo.EduSection;
 import com.venson.changliulab.entity.dto.SectionContentDTO;
 import com.venson.changliulab.entity.dto.SectionPreviewDTO;
 import com.venson.changliulab.entity.enums.ReviewStatus;
+import com.venson.changliulab.entity.pojo.EduSection;
+import com.venson.changliulab.entity.vo.admin.CommonMetaVo;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +23,7 @@ public interface EduSectionService extends IService<EduSection> {
 
     void updateSectionById(Long sectionId, SectionContentDTO sectionContentDTO);
 
-    SectionContentDTO getSectionById(Long sectionId);
+    SectionContentDTO getSectionById(Long sectionId, CommonMetaVo vo);
 
     Long addSection(SectionContentDTO section);
 
